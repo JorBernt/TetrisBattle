@@ -29,6 +29,7 @@ public class Point {
         pointOffset = settings.getOffset();
     }
 
+
     public Point (int x, int y, int playerID,  Convert convert) {
         Point p = new Point(x,y, playerID);
         switch (convert) {

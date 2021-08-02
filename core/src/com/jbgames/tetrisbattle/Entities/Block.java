@@ -12,12 +12,12 @@ import java.util.List;
 public class Block {
 
     private BlockTypes type;
-    private final Point position;
+    private Point position;
     private final int startPosY;
     private final int startPosX;
     private int[][] blockLayout;
     private final Player player;
-    private boolean toBePlaced;
+    private boolean toBePlaced, ghost;
     private BlockTypes.Direction curDirection;
 
     public Block(BlockTypes type, Player player, Point startPosition) {
@@ -32,6 +32,11 @@ public class Block {
     }
 
     public Block(BlockTypes type, Player player) {this(type, player, new Point(0,0));}
+
+    public Block(BlockTypes type, Player player, boolean ghost) {
+        this(type, player);
+        this.ghost = true;
+    }
 
     private void initBlocks() {
         blockLayout = type.getPosition(type, curDirection);
@@ -191,6 +196,19 @@ public class Block {
 
     public Point getPosition() {
         return position;
+    }
+
+    public void setPosition(Point position) {
+        this.position.x = position.x;
+        this.position.y = position.y;
+    }
+
+    public int[][] getBlockLayout() {
+        return blockLayout;
+    }
+
+    public void setBlockLayout(int[][] blockLayout) {
+        this.blockLayout = blockLayout;
     }
 
     public Block copy() {

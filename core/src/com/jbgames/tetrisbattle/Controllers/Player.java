@@ -24,7 +24,7 @@ public class Player {
     private boolean downPressed;
     private int downTimer;
     private final int DOWNTIMER = 5;
-    private Block holdBlock;
+    private Block holdBlock, ghostBlock;
     private int score;
 
     public Player(int id, GameWorld world) {
@@ -50,9 +50,12 @@ public class Player {
             }
         }
         activeBlock = new Block(world.getNewBlock(), this, gridPos[0][5]);
+        ghostBlock = new Block(activeBlock.getType(), this, true);
+
     }
 
     public void update(float delta) {
+        updateGhost();
         fallDown(delta);
         if(downPressed) {
             move(BlockTypes.Direction.DOWN);
@@ -61,6 +64,14 @@ public class Player {
         checkForFullLines(true);
     }
 
+    private void updateGhost() {
+        ghostBlock.setNewBlock(activeBlock.getType());
+        ghostBlock.setPosition(activeBlock.getPosition());
+        ghostBlock.setBlockLayout(activeBlock.getBlockLayout());
+        while(canMoveBlock(ghostBlock, BlockTypes.Direction.DOWN)) {
+            ghostBlock.move(BlockTypes.Direction.DOWN);
+        }
+    }
 
     public void moveDown() {
         downPressed = !downPressed;
@@ -99,15 +110,15 @@ public class Player {
     public void move(BlockTypes.Direction direction) {
         switch (direction) {
             case LEFT:
-                if (canMoveBlock(activeBlock, -1))
+                if (canMoveBlock(activeBlock, BlockTypes.Direction.LEFT))
                     activeBlock.move(BlockTypes.Direction.LEFT);
                 break;
             case RIGHT:
-                if (canMoveBlock(activeBlock, 1))
+                if (canMoveBlock(activeBlock, BlockTypes.Direction.RIGHT))
                     activeBlock.move(BlockTypes.Direction.RIGHT);
                 break;
             case DOWN:
-                if (canMoveBlock(activeBlock,0)) {
+                if (canMoveBlock(activeBlock, BlockTypes.Direction.DOWN)) {
                     if(downTimer <= 0) {
                         activeBlock.move(BlockTypes.Direction.DOWN);
                         downTimer = DOWNTIMER;
@@ -119,7 +130,7 @@ public class Player {
     }
 
     public void placeBlockInstant() {
-        while (canMoveBlock(activeBlock, 0)) {
+        while (canMoveBlock(activeBlock, BlockTypes.Direction.DOWN)) {
             activeBlock.move(BlockTypes.Direction.DOWN);
         }
         placeBlock(activeBlock, playerGrid);
@@ -128,7 +139,7 @@ public class Player {
 
     private void fallDown(float delta) {
             if (!activeBlock.isToBePlaced() || !collision(activeBlock)) {
-                if(canMoveBlock(activeBlock, 0)) {
+                if(canMoveBlock(activeBlock, BlockTypes.Direction.DOWN)) {
                     if(timer <= 0) {
                         activeBlock.move(BlockTypes.Direction.DOWN);
                         timer = TIMER;
@@ -170,19 +181,20 @@ public class Player {
             Point gridPos = pos.coordToGridConvert();
             if (gridPos.y - 1 < 0 || gridPos.y < 0 || gridPos.x < 0 ||gridPos.x > 9) return true;
             if (playerGrid[gridPos.y - 1][gridPos.x] != BlockTypes.NONE) return true;
+            if (playerGrid[gridPos.y][gridPos.x] != BlockTypes.NONE) return true;
         }
         return false;
     }
 
-    public boolean canMoveBlock(Block block, int dir) {
+    public boolean canMoveBlock(Block block, BlockTypes.Direction direction) {
         boolean canMove = true;
         for (Point pos : block.getBlocks()) {
             Point gridPos = pos.coordToGridConvert();
-            if (dir == -1 && (gridPos.x == 0 || playerGrid[gridPos.y][gridPos.x - 1] != BlockTypes.NONE))
+            if (direction == BlockTypes.Direction.LEFT && (gridPos.x == 0 || playerGrid[gridPos.y][gridPos.x - 1] != BlockTypes.NONE))
                 canMove = false;
-            if (dir == 1 && (gridPos.x == 9 || playerGrid[gridPos.y][gridPos.x + 1] != BlockTypes.NONE))
+            if (direction == BlockTypes.Direction.RIGHT && (gridPos.x == 9 || playerGrid[gridPos.y][gridPos.x + 1] != BlockTypes.NONE))
                 canMove = false;
-            if(dir == 0 && (gridPos.y == 0 || playerGrid[gridPos.y-1][gridPos.x] != BlockTypes.NONE))
+            if(direction == BlockTypes.Direction.DOWN && (gridPos.y == 0 || playerGrid[gridPos.y-1][gridPos.x] != BlockTypes.NONE))
                 canMove = false;
         }
         return canMove;
@@ -231,6 +243,8 @@ public class Player {
     public Block getActiveBlock() {
         return activeBlock;
     }
+
+    public Block getGhostBlock() { return ghostBlock; }
 
     public BlockTypes[][] getPlayerGrid() {
         return playerGrid;

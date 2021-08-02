@@ -1,7 +1,9 @@
 package com.jbgames.tetrisbattle.GameWorld;
 
 import Tools.Point;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -32,13 +34,10 @@ public class GameRenderer {
         batch = new SpriteBatch();
         batch.setProjectionMatrix(cam.combined);
         hud = new Hud();
-        initGameObjects();
 
-    }
-
-    private void initGameObjects() {
         player1 = world.getPlayer(1);
         player2 = world.getPlayer(2);
+
     }
 
     public void render() {
@@ -57,6 +56,7 @@ public class GameRenderer {
     }
 
     public void renderReady() {
+
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(55 / 255.0f, 80 / 255.0f, 100 / 255.0f, 1);
         shapeRenderer.rect(0, 0, TetrisBattle.V_WIDTH, TetrisBattle.V_HEIGHT);
@@ -69,6 +69,8 @@ public class GameRenderer {
     }
 
     public void renderRunning(GameWorld.GameState state) {
+
+
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(55 / 255.0f, 80 / 255.0f, 100 / 255.0f, 1);
         shapeRenderer.rect(0, 0, TetrisBattle.V_WIDTH, TetrisBattle.V_HEIGHT);
@@ -90,9 +92,22 @@ public class GameRenderer {
             }
         }
 
+
+
+        if(world.getCurrentState() == GameWorld.GameState.RUNNING) {
+            shapeRenderer.end();
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            renderGhost(player1);
+            renderGhost(player2);
+        }
+
         renderBlock(player1);
         renderBlock(player2);
+
         shapeRenderer.end();
+        Gdx.gl.glDisable(GL20.GL_BLEND);
 
 
         batch.begin();
@@ -101,20 +116,22 @@ public class GameRenderer {
         }
         hud.draw(Integer.toString(player1.getScore()), Hud.TextType.PLAYER1, batch);
         hud.draw(Integer.toString(player2.getScore()), Hud.TextType.PLAYER2, batch);
-
         batch.end();
 
 
-
-
     }
+
 
     private void renderHoldBlock(Player player) {
         Point area = PlayerSettings.getSettings(player.getId()).getHoldArea();
         Block holdBlock = player.getHoldBlock();
         for (Point block : holdBlock.getBlocks()) {
             Color color = holdBlock.getColor();
-            blockRenderer(area.x + block.x + (holdBlock.getType() != BlockTypes.I ? GameWorld.BLOCK_SIZE / 2 : 0), area.y + block.y, color);
+            int offset = 0;
+            if (holdBlock.getType() != BlockTypes.I && holdBlock.getType() != BlockTypes.SQUARE) {
+                offset = GameWorld.BLOCK_SIZE / 2;
+            }
+            blockRenderer(area.x + block.x + offset, area.y + block.y, color, 1f);
         }
 
     }
@@ -126,7 +143,7 @@ public class GameRenderer {
         for (Block block : blockQueue) {
             for (Point blockPoint : block.getBlocks()) {
                 Color color = block.getColor();
-                blockRenderer(blockPoint.x + area.x, blockPoint.y + area.y - offset, color);
+                blockRenderer(blockPoint.x + area.x, blockPoint.y + area.y - offset, color, 1f);
             }
             offset += GameWorld.BLOCK_SIZE * 3 + 10;
         }
@@ -168,15 +185,26 @@ public class GameRenderer {
         Block playerBlock = player.getActiveBlock();
         Color color = playerBlock.getColor();
         for (Point block : playerBlock.getBlocks()) {
-            blockRenderer(block.x, block.y, color);
+            blockRenderer(block.x, block.y, color, 1f);
         }
     }
 
-    private void blockRenderer(int x, int y, Color color) {
-        shapeRenderer.setColor(Color.BLACK);
+    private void renderGhost(Player player) {
+        Block playerBlock = player.getGhostBlock();
+        Color color = playerBlock.getColor();
+
+        for (Point block : playerBlock.getBlocks()) {
+            blockRenderer(block.x, block.y, color, 0.4f);
+        }
+    }
+
+    private void blockRenderer(int x, int y, Color color, float alpha) {
+        color.set(color.r, color.g, color.b, alpha);
+
+        shapeRenderer.setColor(0, 0, 0, alpha);
         shapeRenderer.rect(x, y, GameWorld.BLOCK_SIZE, GameWorld.BLOCK_SIZE);
         shapeRenderer.setColor(color);
-        shapeRenderer.rect(x+2, y+2, GameWorld.BLOCK_SIZE-4, GameWorld.BLOCK_SIZE-4);
+        shapeRenderer.rect(x + 2, y + 2, GameWorld.BLOCK_SIZE - 4, GameWorld.BLOCK_SIZE - 4);
 
     }
 
@@ -185,7 +213,7 @@ public class GameRenderer {
         if (playerGrid[i][j] != BlockTypes.NONE) {
             Color color = playerGrid[i][j].getColor();
             Point pos = new Point(j, i, player.getId(), Point.Convert.GRID_TO_COORD);
-            blockRenderer(pos.x, pos.y, color);
+            blockRenderer(pos.x, pos.y, color, 1f);
         }
     }
 }

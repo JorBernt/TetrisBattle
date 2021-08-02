@@ -77,8 +77,9 @@ public enum BlockTypes {
             case SQUARE:
                 pos = new int[][]
                                 {{0,0,0,0},
-                                {0,1,1},
-                                {0,1,1},};
+                                {0,1,1,0},
+                                {0,1,1,0},
+                                {0,0,0,0}};
                 break;
 
 

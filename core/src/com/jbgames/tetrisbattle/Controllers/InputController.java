@@ -71,11 +71,13 @@ public class InputController implements InputProcessor {
 
     @Override
     public boolean keyUp(int keycode) {
-        if(keycode == 62) {
-            player1.moveDown();
-        }
-        if(keycode == 144) {
-            player2.moveDown();
+        if(world.getCurrentState() == GameWorld.GameState.RUNNING) {
+            if(keycode == 62) {
+                player1.moveDown();
+            }
+            if(keycode == 144) {
+                player2.moveDown();
+            }
         }
         return false;
     }

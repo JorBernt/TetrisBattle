@@ -1,26 +1,18 @@
 package com.jbgames.tetrisbattle.GameWorld;
 
 
-import Tools.Point;
-import com.badlogic.gdx.math.Vector2;
 import com.jbgames.tetrisbattle.Controllers.Player;
 import com.jbgames.tetrisbattle.Controllers.PlayerSettings;
-import com.jbgames.tetrisbattle.Entities.Block;
 import com.jbgames.tetrisbattle.Entities.BlockTypes;
-import com.jbgames.tetrisbattle.Scenes.Hud;
 
 import java.util.*;
 
 public class GameWorld {
 
     public static final int BLOCK_SIZE = 40;
-
     private Player player1, player2;
-
     private final Random random;
-
     private final List<BlockTypes> types;
-
     private float countDown = 3f;
 
 
@@ -63,7 +55,6 @@ public class GameWorld {
 
     public void updateCountDown(float delta) {
         countDown -= delta;
-        System.out.println(countDown);
         if(countDown <= 0) {
             countDown = 3f;
             currentState = GameState.RUNNING;
