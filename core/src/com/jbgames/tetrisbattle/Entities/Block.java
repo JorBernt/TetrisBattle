@@ -38,8 +38,12 @@ public class Block {
     }
 
     public void rotate(BlockTypes.Direction direction) {
+        int[][] temp = new int[blockLayout.length][blockLayout.length];
+        temp = copyArray(blockLayout);
+
         switch (direction) {
             case LEFT: {
+                blockLayout = rotateCounterClockWise(blockLayout);
                 switch (curDirection) {
                     case LEFT:
                         curDirection = BlockTypes.Direction.DOWN;
@@ -55,8 +59,10 @@ public class Block {
                         break;
                 }
                 break;
+
             }
             case RIGHT: {
+                blockLayout = rotateClockWise(blockLayout);
                 switch (curDirection) {
                     case LEFT:
                         curDirection = BlockTypes.Direction.UP;
@@ -74,15 +80,7 @@ public class Block {
                 break;
             }
         }
-        int[][] temp = new int[blockLayout.length][blockLayout.length];
 
-        for(int i = 0; i < blockLayout.length; i++) {
-            for(int j = 0; j < blockLayout.length; j++) {
-                temp[i][j] = blockLayout[i][j];
-            }
-        }
-
-        blockLayout = type.getPosition(type, curDirection);
         for(Point pos : getBlocks()) {
             Point gridPos = pos.coordToGridConvert();
             if(gridPos.x < 0) {
@@ -99,6 +97,39 @@ public class Block {
         if(player.collision(this)) {
             blockLayout = temp;
         }
+    }
+
+    private int[][] copyArray(int[][] array) {
+        int n = array.length;
+        int[][] copy = new int[n][n];
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < n; j++) {
+                copy[i][j] = array[i][j];
+            }
+        }
+        return copy;
+    }
+
+    private int[][] rotateClockWise(int[][] matrix) {
+        int size = matrix.length;
+        int[][] ret = new int[size][size];
+
+        for (int i = 0; i < size; ++i)
+            for (int j = 0; j < size; ++j)
+                ret[i][j] = matrix[size - j - 1][i];
+
+        return ret;
+    }
+
+    private int[][] rotateCounterClockWise(int[][] matrix) {
+        int size = matrix.length;
+        int[][] ret = new int[size][size];
+
+        for (int i = 0; i < size; ++i)
+            for (int j = 0; j < size; ++j)
+                ret[i][j] = matrix[j][size - i - 1];
+
+        return ret;
     }
 
     public void move(BlockTypes.Direction direction) {

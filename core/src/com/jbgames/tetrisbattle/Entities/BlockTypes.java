@@ -34,173 +34,44 @@ public enum BlockTypes {
         int[][] pos = new int[4][4];
         switch (type) {
             case I:
-                switch (direction) {
-                    case UP :
-                    case DOWN :
-                        pos = new int[][]
-                                        {{0,0,0,0},
-                                        {0,0,0,0},
-                                        {1,1,1,1},
-                                        {0,0,0,0},};
-                        break;
-                    case LEFT :
-                        pos = new int[][]
-                                        {{0,1,0,0},
-                                        {0,1,0,0},
-                                        {0,1,0,0},
-                                        {0,1,0,0},};
-                        break;
-                    case RIGHT:
-                        pos = new int[][]
-                                        {{0,0,1,0},
-                                        {0,0,1,0},
-                                        {0,0,1,0},
-                                        {0,0,1,0},};
-                        break;
-                }
+                pos = new int[][]
+                                {{0,0,0,0},
+                                {0,0,0,0},
+                                {1,1,1,1},
+                                {0,0,0,0},};
                 break;
 
             case T:
-                switch (direction) {
-                    case UP :
-                        pos = new int[][]
-                                        {{1,1,1},
-                                        {0,1,0},
-                                        {0,0,0},};
-                        break;
-                    case DOWN :
-                        pos = new int[][]
-                                        {{0,0,0},
-                                        {0,1,0},
-                                        {1,1,1},};
-                        break;
-                    case LEFT :
-                        pos = new int[][]
-                                        {{0,1,0},
-                                        {0,1,1},
-                                        {0,1,0},};
-                        break;
-                    case RIGHT:
-                        pos = new int[][]
-                                        {{0,1,0},
-                                        {1,1,0},
-                                        {0,1,0},};
-                        break;
-                }
+                pos = new int[][]
+                                {{0,0,0},
+                                {1,1,1},
+                                {0,1,0},};
                 break;
 
             case L:
-                switch (direction) {
-                    case UP :
-                        pos = new int[][]
-                                        {{1,1,1},
-                                        {1,0,0},
-                                        {0,0,0},};
-                        break;
-                    case DOWN :
-                        pos = new int[][]
-                                        {{0,0,0},
-                                        {0,0,1},
-                                        {1,1,1},};
-                        break;
-                    case LEFT :
-                        pos = new int[][]
-                                        {{0,1,0},
-                                        {0,1,0},
-                                        {0,1,1},};
-                        break;
-                    case RIGHT:
-                        pos = new int[][]
-                                        {{1,1,0},
-                                        {0,1,0},
-                                        {0,1,0},};
-                        break;
-                }
+                pos = new int[][]
+                                {{0,0,0},
+                                {1,1,1},
+                                {1,0,0},};
                 break;
             case REVERSE_L:
-                switch (direction) {
-                    case UP :
-                        pos = new int[][]
-                                        {{1,1,1},
-                                        {0,0,1},
-                                        {0,0,0},};
-                        break;
-                    case DOWN :
-                        pos = new int[][]
-                                        {{0,0,0},
-                                        {1,0,0},
-                                        {1,1,1},};
-                        break;
-                    case LEFT :
-                        pos = new int[][]
-                                        {{0,1,1},
-                                        {0,1,0},
-                                        {0,1,0},};
-                        break;
-                    case RIGHT:
-                        pos = new int[][]
-                                        {{0,1,0},
-                                        {0,1,0},
-                                        {1,1,0},};
-                        break;
-                }
+                pos = new int[][]
+                                {{0,0,0},
+                                {1,1,1},
+                                {0,0,1},};
                 break;
 
             case SQUIGGLY:
-                switch (direction) {
-                    case UP :
-                        pos = new int[][]
-                                        {{0,0,0},
-                                        {0,1,1},
-                                        {1,1,0},};
-                        break;
-                    case DOWN :
-                        pos = new int[][]
-                                        {{0,0,0},
-                                        {0,1,1},
-                                        {1,1,0},};
-                        break;
-                    case LEFT :
-                        pos = new int[][]
-                                        {{1,0,0},
-                                        {1,1,0},
-                                        {0,1,0},};
-                        break;
-                    case RIGHT:
-                        pos = new int[][]
-                                        {{0,1,0},
-                                        {0,1,1},
-                                        {0,0,1},};
-                        break;
-                }
+                pos = new int[][]
+                                {{0,0,0},
+                                {0,1,1},
+                                {1,1,0},};
                 break;
             case REVERSE_SQUIGGLY:
-                switch (direction) {
-                    case UP :
-                        pos = new int[][]
-                                        {{0,0,0},
-                                        {1,1,0},
-                                        {0,1,1},};
-                        break;
-                    case DOWN :
-                        pos = new int[][]
-                                        {{0,0,0},
-                                        {1,1,0},
-                                        {0,1,1},};
-                        break;
-                    case LEFT :
-                        pos = new int[][]
-                                        {{0,1,0},
-                                        {1,1,0},
-                                        {1,0,0},};
-                        break;
-                    case RIGHT:
-                        pos = new int[][]
-                                        {{0,0,1},
-                                        {0,1,1},
-                                        {0,1,0},};
-                        break;
-                }
+                pos = new int[][]
+                                {{0,0,0},
+                                {1,1,0},
+                                {0,1,1},};
                 break;
 
             case SQUARE:

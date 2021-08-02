@@ -114,7 +114,7 @@ public class GameRenderer {
         Block holdBlock = player.getHoldBlock();
         for (Point block : holdBlock.getBlocks()) {
             Color color = holdBlock.getColor();
-            blockRenderer(area.x + block.x, area.y + block.y, color);
+            blockRenderer(area.x + block.x + (holdBlock.getType() != BlockTypes.I ? GameWorld.BLOCK_SIZE / 2 : 0), area.y + block.y, color);
         }
 
     }
