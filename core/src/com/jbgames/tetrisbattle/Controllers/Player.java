@@ -1,10 +1,10 @@
 package com.jbgames.tetrisbattle.Controllers;
 
-import com.jbgames.tetrisbattle.Entities.PowerUp;
-import com.jbgames.tetrisbattle.Tools.Point;
 import com.jbgames.tetrisbattle.Entities.Block;
 import com.jbgames.tetrisbattle.Entities.BlockTypes;
+import com.jbgames.tetrisbattle.Entities.PowerUp;
 import com.jbgames.tetrisbattle.GameWorld.GameWorld;
+import com.jbgames.tetrisbattle.Tools.Point;
 
 import java.util.*;
 
@@ -20,19 +20,25 @@ public class Player {
     private Queue<Block> blockQueue;
     private Block holdBlock, ghostBlock;
     private int score;
+    private final Random random;
 
     private final float FALLDOWN_TIMER = 1f;
     private float fallDownSpeedUp;
     private float gameTimeCounter;
     private float fallDownTimer = FALLDOWN_TIMER;
 
-    private final float MOVE_STEP_TIMER = 0.1f;
     private float moveStepTimer = 0;
 
     private final float POPUP_TIMER = 2f;
     private float popUpTimer = POPUP_TIMER;
     private boolean showPopUp;
     private float popUpAnimation = 0f;
+
+    private float itemDurability;
+    private boolean itemActive;
+    private PowerUp.Item item;
+
+    private boolean itemAffectGameScreen;
 
     private final PlayerController playerController;
 
@@ -44,6 +50,7 @@ public class Player {
         this.playerGrid = new BlockTypes[21][10];
         this.gridPos = new Point[21][10];
         this.world = world;
+        random = new Random();
         init();
         playerController = new PlayerController(PlayerSettings.getSettings(id), this);
     }
@@ -60,50 +67,60 @@ public class Player {
         for (int i = 0; i < 4; i++) {
             blockQueue.add(new Block(world.getNewBlock(), this, new Point(30, 400)));
         }
-        activeBlock = new Block(world.getNewBlock(), this, gridPos[0][5]);
-        ghostBlock = new Block(activeBlock.getType(), this, true);
+        activeBlock = new Block(world.getNewBlock(), this, gridPos[0][4]);
+        ghostBlock = new Block(activeBlock.getType(), this);
         score = 0;
         gameTimeCounter = 0;
         fallDownSpeedUp = 0.1f;
         holdBlock = new Block(BlockTypes.NONE, this);
-        powerUp = PowerUp.Item.INSTANT_FALL;
+        powerUp = PowerUp.Item.NONE;
         popUp = "";
         showPopUp = false;
+        itemActive = false;
+        itemAffectGameScreen = false;
     }
 
     public void update(float delta) {
         updateGhost();
         fallDown(delta);
         gameTimeCounter += delta;
-        if(gameTimeCounter > 20) {
+        if (gameTimeCounter > 20) {
             fallDownSpeedUp += 0.1f;
             fallDownSpeedUp = Math.min(0.8f, fallDownSpeedUp);
             gameTimeCounter = 0f;
-            popUp = "Speed up!";
+            if(showPopUp) popUp += " Speed up!";
+            else popUp = "Speed up!";
             showPopUp = true;
+            popUpTimer = POPUP_TIMER;
         }
 
-        if(showPopUp) {
-            if(popUpTimer <= 0) {
+        if (showPopUp) {
+            if (popUpTimer <= 0) {
                 popUpTimer = POPUP_TIMER;
                 showPopUp = false;
                 popUpAnimation = 0f;
             }
-            popUpAnimation += 20*delta;
+            popUpAnimation += 20 * delta;
             popUpTimer -= delta;
         }
 
+        if (itemActive) {
+            if (itemDurability <= 0) {
+                itemActive = false;
+                item = PowerUp.Item.NONE;
+                itemAffectGameScreen = false;
+            }
+            itemDurability -= delta;
+        }
+
         //Controls
-        if(playerController.isDownPressed()) {
+        if (playerController.isDownPressed()) {
             move(BlockTypes.Direction.DOWN, delta);
-        }
-        else if(playerController.isLeftPressed()) {
+        } else if (playerController.isLeftPressed()) {
             move(BlockTypes.Direction.LEFT, delta);
-        }
-        else if(playerController.isRightPressed()) {
+        } else if (playerController.isRightPressed()) {
             move(BlockTypes.Direction.RIGHT, delta);
-        }
-        else moveStepTimer = 0f;
+        } else moveStepTimer = 0f;
 
         checkForFullLines(true);
     }
@@ -112,32 +129,33 @@ public class Player {
         ghostBlock.setNewBlock(activeBlock.getType());
         ghostBlock.setPosition(activeBlock.getPosition());
         ghostBlock.setBlockLayout(activeBlock.getBlockLayout());
-        while(canMoveBlock(ghostBlock, BlockTypes.Direction.DOWN)) {
+        while (canMoveBlock(ghostBlock, BlockTypes.Direction.DOWN)) {
             ghostBlock.move(BlockTypes.Direction.DOWN);
         }
     }
 
 
     public void rotate(BlockTypes.Direction direction) {
-        activeBlock.rotate(direction);
+        if(item != PowerUp.Item.NO_ROTATION && !itemActive) {
+            activeBlock.rotate(direction);
+        }
     }
 
     public void holdBlock() {
-        if(activeBlock.isToBePlaced()) return;
-        if(holdBlock.getType() == BlockTypes.NONE) {
+        if (activeBlock.isToBePlaced()) return;
+        if (holdBlock.getType() == BlockTypes.NONE) {
             holdBlock = activeBlock.copy();
             activeBlock.nextBlock(nextBlock());
-        }
-        else {
+        } else {
             Block temp = holdBlock;
             holdBlock = activeBlock.copy();
             activeBlock.setNewBlock(temp.getType());
-            for(Point pos : activeBlock.getBlocks()) {
+            for (Point pos : activeBlock.getBlocks()) {
                 Point p = pos.coordToGridConvert();
-                if(p.x > 9) activeBlock.move(BlockTypes.Direction.LEFT);
-                if(p.x < 0) activeBlock.move(BlockTypes.Direction.RIGHT);
+                if (p.x > 9) activeBlock.move(BlockTypes.Direction.LEFT);
+                if (p.x < 0) activeBlock.move(BlockTypes.Direction.RIGHT);
             }
-            if(collision(activeBlock)) {
+            if (collision(activeBlock)) {
                 temp = activeBlock.copy();
                 activeBlock.setNewBlock(holdBlock.getType());
                 holdBlock = temp;
@@ -146,7 +164,17 @@ public class Player {
     }
 
     public void move(BlockTypes.Direction direction, float delta) {
-        if(moveStepTimer <= 0) {
+        if (item == PowerUp.Item.MIRROR && itemActive) {
+            switch (direction) {
+                case LEFT:
+                    direction = BlockTypes.Direction.RIGHT;
+                    break;
+                case RIGHT:
+                    direction = BlockTypes.Direction.LEFT;
+                    break;
+            }
+        }
+        if (moveStepTimer <= 0) {
             switch (direction) {
                 case LEFT:
                     if (canMoveBlock(activeBlock, BlockTypes.Direction.LEFT))
@@ -162,6 +190,7 @@ public class Player {
                     } else activeBlock.setToBePlaced(true);
                     break;
             }
+            float MOVE_STEP_TIMER = 0.1f;
             moveStepTimer = MOVE_STEP_TIMER;
         }
         moveStepTimer -= delta;
@@ -177,28 +206,28 @@ public class Player {
     }
 
     private void fallDown(float delta) {
-            if (!activeBlock.isToBePlaced() || !collision(activeBlock)) {
-                if(canMoveBlock(activeBlock, BlockTypes.Direction.DOWN)) {
-                    if(fallDownTimer <= 0) {
-                        activeBlock.move(BlockTypes.Direction.DOWN);
-                        fallDownTimer = FALLDOWN_TIMER-fallDownSpeedUp;
-                    }
-                    activeBlock.setToBePlaced(false);
+        if (!activeBlock.isToBePlaced() || !collision(activeBlock)) {
+            if (canMoveBlock(activeBlock, BlockTypes.Direction.DOWN)) {
+                if (fallDownTimer <= 0) {
+                    activeBlock.move(BlockTypes.Direction.DOWN);
+                    fallDownTimer = FALLDOWN_TIMER - fallDownSpeedUp;
                 }
-            } else {
-                if(fallDownTimer <= 0) {
-                    placeBlock(activeBlock, playerGrid);
-                    activeBlock.setToBePlaced(true);
-                    activeBlock.nextBlock(nextBlock());
-                    fallDownTimer = FALLDOWN_TIMER-fallDownSpeedUp;
-                    if(collision(activeBlock)) {
-                        world.setCurrentState(GameWorld.GameState.GAMEOVER);
-                    }
-                }
+                activeBlock.setToBePlaced(false);
             }
-            if (collision(activeBlock)) {
+        } else {
+            if (fallDownTimer <= 0) {
+                placeBlock(activeBlock, playerGrid);
                 activeBlock.setToBePlaced(true);
+                activeBlock.nextBlock(nextBlock());
+                fallDownTimer = FALLDOWN_TIMER - fallDownSpeedUp;
+                if (collision(activeBlock)) {
+                    world.setCurrentState(GameWorld.GameState.GAMEOVER);
+                }
             }
+        }
+        if (collision(activeBlock)) {
+            activeBlock.setToBePlaced(true);
+        }
         fallDownTimer -= delta;
     }
 
@@ -216,8 +245,8 @@ public class Player {
     }
 
     public void useItem() {
-        if(powerUp != PowerUp.Item.NONE) {
-            PowerUp.useItem(this, world.getPlayer(id==1?2:1), powerUp);
+        if (powerUp != PowerUp.Item.NONE) {
+            PowerUp.useItem(this, world.getPlayer(id == 1 ? 2 : 1), powerUp);
             powerUp = PowerUp.Item.NONE;
         }
     }
@@ -225,7 +254,7 @@ public class Player {
     public boolean collision(Block block) {
         for (Point pos : block.getBlocks()) {
             Point gridPos = pos.coordToGridConvert();
-            if (gridPos.y - 1 < 0 || gridPos.y < 0 || gridPos.x < 0 ||gridPos.x > 9) return true;
+            if (gridPos.y - 1 < 0 || gridPos.y < 0 || gridPos.x < 0 || gridPos.x > 9) return true;
             if (playerGrid[gridPos.y - 1][gridPos.x] != BlockTypes.NONE) return true;
             if (playerGrid[gridPos.y][gridPos.x] != BlockTypes.NONE) return true;
         }
@@ -240,7 +269,7 @@ public class Player {
                 canMove = false;
             if (direction == BlockTypes.Direction.RIGHT && (gridPos.x == 9 || playerGrid[gridPos.y][gridPos.x + 1] != BlockTypes.NONE))
                 canMove = false;
-            if(direction == BlockTypes.Direction.DOWN && (gridPos.y == 0 || playerGrid[gridPos.y-1][gridPos.x] != BlockTypes.NONE))
+            if (direction == BlockTypes.Direction.DOWN && (gridPos.y == 0 || playerGrid[gridPos.y - 1][gridPos.x] != BlockTypes.NONE))
                 canMove = false;
         }
         return canMove;
@@ -249,27 +278,27 @@ public class Player {
     private void checkForFullLines(boolean wipe) {
         List<Integer> fullLines = new ArrayList<>();
         int numberOfClearedLines = 0;
-        for(int i = 0; i < 21; i++) {
+        for (int i = 0; i < 21; i++) {
             boolean full = true;
-            for(int j = 0; j < 10; j++) {
-                if(playerGrid[i][j] == BlockTypes.NONE) {
+            for (int j = 0; j < 10; j++) {
+                if (playerGrid[i][j] == BlockTypes.NONE) {
                     full = false;
                     break;
                 }
             }
-            if(full) {
+            if (full) {
                 fullLines.add(i);
                 numberOfClearedLines++;
             }
         }
 
-        if(numberOfClearedLines == 0) return;
+        if (numberOfClearedLines == 0) return;
 
-        for(int n : fullLines) {
-            for(int i = 0; i < 10; i++) {
+        for (int n : fullLines) {
+            for (int i = 0; i < 10; i++) {
                 playerGrid[n][i] = BlockTypes.PLACED_BLOCK;
             }
-            if(wipe) {
+            if (wipe) {
                 for (int i = n; i < 20; i++) {
                     for (int j = 0; j < 10; j++) {
                         playerGrid[i][j] = playerGrid[i + 1][j];
@@ -281,18 +310,16 @@ public class Player {
         addPowerUp(numberOfClearedLines);
     }
 
-    public void attacked(PowerUp.Item item) {
-        popUp = "Opponent used " + item.getName() + "!";
-        showPopUp = true;
-        switch (item) {
-            case INSTANT_FALL:
-                placeBlockInstant();
-                break;
-        }
+
+    public void activateItem(PowerUp.Item item, float durability) {
+        this.item = item;
+        itemDurability = durability;
+        itemActive = true;
     }
 
     private void addPowerUp(int numberOfClearedLines) {
-        powerUp = PowerUp.Item.INSTANT_FALL;
+        PowerUp.Item[] powerUps = PowerUp.Item.values();
+        powerUp = powerUps[random.nextInt(powerUps.length-1)+1];
         popUp = "You got " + powerUp.getName() + "!";
         showPopUp = true;
     }
@@ -314,7 +341,9 @@ public class Player {
         return activeBlock;
     }
 
-    public Block getGhostBlock() { return ghostBlock; }
+    public Block getGhostBlock() {
+        return ghostBlock;
+    }
 
     public BlockTypes[][] getPlayerGrid() {
         return playerGrid;
@@ -344,11 +373,27 @@ public class Player {
         return popUp;
     }
 
-    public boolean showPopUp() {
+    public boolean getShowPopUp() {
         return showPopUp;
+    }
+
+    public void setShowPopUp(boolean value) {
+        showPopUp = value;
     }
 
     public float getPopUpAnimation() {
         return popUpAnimation;
+    }
+
+    public boolean itemAffectGameScreen() {
+        return itemAffectGameScreen;
+    }
+
+    public void setItemAffectGameScreen(boolean value) {
+        itemAffectGameScreen = value;
+    }
+
+    public void setPopUp(String text) {
+        popUp = text;
     }
 }

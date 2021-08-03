@@ -122,10 +122,10 @@ public class GameRenderer {
         hud.draw(player1.getPowerUp().getName(), Hud.TextType.PLAYER1_POWERUP, batch, Hud.TextSize.SMALL);
         hud.draw(player2.getPowerUp().getName(), Hud.TextType.PLAYER2_POWERUP, batch, Hud.TextSize.SMALL);
 
-        if(player1.showPopUp())
+        if(player1.getShowPopUp())
         hud.draw(player1.getPopUp(), Hud.TextType.PLAYER1_POWERUP_POPUP, 0, player1.getPopUpAnimation(), batch, Hud.TextSize.MEDIUM);
 
-        if(player2.showPopUp())
+        if(player2.getShowPopUp())
         hud.draw(player2.getPopUp(), Hud.TextType.PLAYER2_POWERUP_POPUP, 0, player2.getPopUpAnimation(), batch, Hud.TextSize.MEDIUM);
 
         if (state == GameWorld.GameState.COUNTDOWN) {
@@ -164,7 +164,7 @@ public class GameRenderer {
     private void renderAreas(Player player) {
         //Main area
         Point mainArea = PlayerSettings.getSettings(player.getId()).getOffset();
-        shapeRenderer.setColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f, 1);
+        shapeRenderer.setColor(player.itemAffectGameScreen() ? Color.CORAL : Color.LIGHT_GRAY);
         shapeRenderer.rect(mainArea.x, mainArea.y, GameWorld.BLOCK_SIZE * 10, GameWorld.BLOCK_SIZE * 21);
         //Next block area
         Point nextBlockArea = PlayerSettings.getSettings(player.getId()).getNextBlockArea();

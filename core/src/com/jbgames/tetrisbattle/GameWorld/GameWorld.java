@@ -102,6 +102,8 @@ public class GameWorld {
     }
 
     public String getCountDown() {
-        return String.format("%.1f", countDown);
+        if(countDown >= 2) return "READY!";
+        if(countDown >= 1) return "SET!";
+        else return "GO!";
     }
 }

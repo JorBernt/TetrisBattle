@@ -1,5 +1,7 @@
 package com.jbgames.tetrisbattle.Controllers;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.jbgames.tetrisbattle.GameWorld.GameWorld;
 
@@ -19,7 +21,7 @@ public class InputController implements InputProcessor {
         if(world.getCurrentState() == GameWorld.GameState.READY) {
             world.setCurrentState(GameWorld.GameState.COUNTDOWN);
         }
-        if(world.getCurrentState() == GameWorld.GameState.GAMEOVER) {
+        if(world.getCurrentState() == GameWorld.GameState.GAMEOVER && keycode == Input.Keys.ESCAPE) {
             world.setCurrentState(GameWorld.GameState.READY);
             world.reset();
         }

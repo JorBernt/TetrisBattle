@@ -16,7 +16,7 @@ public class Block {
     private final int startPosX;
     private int[][] blockLayout;
     private final Player player;
-    private boolean toBePlaced, ghost;
+    private boolean toBePlaced;
     private BlockTypes.Direction curDirection;
 
     public Block(BlockTypes type, Player player, Point startPosition) {
@@ -32,10 +32,6 @@ public class Block {
 
     public Block(BlockTypes type, Player player) {this(type, player, new Point(0,0));}
 
-    public Block(BlockTypes type, Player player, boolean ghost) {
-        this(type, player);
-        this.ghost = true;
-    }
 
     private void initBlocks() {
         blockLayout = type.getPosition(type, curDirection);
