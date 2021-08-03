@@ -1,7 +1,6 @@
 package com.jbgames.tetrisbattle.Controllers;
 
 import com.badlogic.gdx.InputProcessor;
-import com.jbgames.tetrisbattle.Entities.BlockTypes;
 import com.jbgames.tetrisbattle.GameWorld.GameWorld;
 
 public class InputController implements InputProcessor {

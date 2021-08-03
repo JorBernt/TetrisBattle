@@ -38,6 +38,9 @@ public class PlayerController {
             case INSTANT_DROP:
                 player.placeBlockInstant();
                 break;
+            case USE_ITEM:
+                player.useItem();
+                break;
 
         }
     }

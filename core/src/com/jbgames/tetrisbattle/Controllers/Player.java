@@ -1,14 +1,12 @@
 package com.jbgames.tetrisbattle.Controllers;
 
+import com.jbgames.tetrisbattle.Entities.PowerUp;
 import com.jbgames.tetrisbattle.Tools.Point;
 import com.jbgames.tetrisbattle.Entities.Block;
 import com.jbgames.tetrisbattle.Entities.BlockTypes;
 import com.jbgames.tetrisbattle.GameWorld.GameWorld;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 
 public class Player {
@@ -31,6 +29,8 @@ public class Player {
 
     private final PlayerController playerController;
 
+    private PowerUp.Item powerUp;
+
     public Player(int id, GameWorld world) {
         this.id = id;
         this.playerGrid = new BlockTypes[21][10];
@@ -39,6 +39,7 @@ public class Player {
         score = 0;
         blockQueue = new LinkedList<>();
         holdBlock = new Block(BlockTypes.NONE, this);
+        powerUp = PowerUp.Item.NONE;
 
         for (int i = 0; i < 4; i++) {
             blockQueue.add(new Block(world.getNewBlock(), this, new Point(30, 400)));
@@ -179,6 +180,11 @@ public class Player {
         }
     }
 
+    public void useItem() {
+        PowerUp.useItem(this, world.getPlayer(id==1?2:1), powerUp);
+        powerUp = PowerUp.Item.NONE;
+    }
+
     public boolean collision(Block block) {
         for (Point pos : block.getBlocks()) {
             Point gridPos = pos.coordToGridConvert();
@@ -235,9 +241,14 @@ public class Player {
             }
         }
         updateScore(numberOfClearedLines);
+        addPowerUp(numberOfClearedLines);
     }
 
-    public void updateScore(int numberOfClearedLines) {
+    private void addPowerUp(int numberOfClearedLines) {
+        powerUp = PowerUp.Item.INSTANT_FALL;
+    }
+
+    private void updateScore(int numberOfClearedLines) {
         score += 100 * numberOfClearedLines * numberOfClearedLines;
     }
 
@@ -269,5 +280,9 @@ public class Player {
 
     public PlayerController getPlayerController() {
         return playerController;
+    }
+
+    public PowerUp.Item getPowerUp() {
+        return powerUp;
     }
 }

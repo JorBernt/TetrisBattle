@@ -37,7 +37,6 @@ public class GameRenderer {
 
         player1 = world.getPlayer(1);
         player2 = world.getPlayer(2);
-
     }
 
     public void render() {
@@ -56,16 +55,13 @@ public class GameRenderer {
     }
 
     public void renderReady() {
-
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(55 / 255.0f, 80 / 255.0f, 100 / 255.0f, 1);
         shapeRenderer.rect(0, 0, TetrisBattle.V_WIDTH, TetrisBattle.V_HEIGHT);
         shapeRenderer.end();
-
         batch.begin();
-        hud.draw("Press any key to start!", Hud.TextType.CENTER_SCREEN, -500, 0, batch);
+        hud.draw("Press any key to start!", Hud.TextType.CENTER_SCREEN, -500, 0, batch, Hud.TextSize.BIG);
         batch.end();
-
     }
 
     public void renderRunning(GameWorld.GameState state) {
@@ -91,8 +87,6 @@ public class GameRenderer {
             }
         }
 
-
-
         if(world.getCurrentState() == GameWorld.GameState.RUNNING) {
             shapeRenderer.end();
             Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -108,13 +102,15 @@ public class GameRenderer {
         shapeRenderer.end();
         Gdx.gl.glDisable(GL20.GL_BLEND);
 
-
         batch.begin();
+
+        hud.draw(Integer.toString(player1.getScore()), Hud.TextType.PLAYER1_SCORE, batch, Hud.TextSize.BIG);
+        hud.draw(Integer.toString(player2.getScore()), Hud.TextType.PLAYER2_SCORE, batch, Hud.TextSize.BIG);
+        hud.draw(player1.getPowerUp().getName(), Hud.TextType.PLAYER1_POWERUP, batch, Hud.TextSize.SMALL);
+        hud.draw(player2.getPowerUp().getName(), Hud.TextType.PLAYER2_POWERUP, batch, Hud.TextSize.SMALL);
         if (state == GameWorld.GameState.COUNTDOWN) {
-            hud.draw(world.getCountDown(), Hud.TextType.CENTER_SCREEN, batch);
+            hud.draw(world.getCountDown(), Hud.TextType.CENTER_SCREEN, batch, Hud.TextSize.BIG);
         }
-        hud.draw(Integer.toString(player1.getScore()), Hud.TextType.PLAYER1, batch);
-        hud.draw(Integer.toString(player2.getScore()), Hud.TextType.PLAYER2, batch);
         batch.end();
 
 
@@ -202,13 +198,10 @@ public class GameRenderer {
     }
 
     private void blockRenderer(int x, int y, Color color, float alpha) {
-        color.set(color.r, color.g, color.b, alpha);
-
         shapeRenderer.setColor(0, 0, 0, alpha);
         shapeRenderer.rect(x, y, GameWorld.BLOCK_SIZE, GameWorld.BLOCK_SIZE);
-        shapeRenderer.setColor(color);
+        shapeRenderer.setColor(color.r, color.g, color.b, alpha);
         shapeRenderer.rect(x + 2, y + 2, GameWorld.BLOCK_SIZE - 4, GameWorld.BLOCK_SIZE - 4);
-
     }
 
     private void renderPlacedBlocks(int i, int j, Player player) {
