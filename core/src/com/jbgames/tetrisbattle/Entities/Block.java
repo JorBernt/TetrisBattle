@@ -1,8 +1,7 @@
 package com.jbgames.tetrisbattle.Entities;
 
-import Tools.Point;
+import com.jbgames.tetrisbattle.Tools.Point;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.jbgames.tetrisbattle.Controllers.Player;
 import com.jbgames.tetrisbattle.GameWorld.GameWorld;
 

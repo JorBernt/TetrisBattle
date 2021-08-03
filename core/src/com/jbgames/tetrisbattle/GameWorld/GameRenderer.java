@@ -1,6 +1,6 @@
 package com.jbgames.tetrisbattle.GameWorld;
 
-import Tools.Point;
+import com.jbgames.tetrisbattle.Tools.Point;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -77,7 +77,6 @@ public class GameRenderer {
 
         renderAreas(player1);
         renderAreas(player2);
-
 
         renderBlockQueue(player1);
         renderBlockQueue(player2);
@@ -164,6 +163,10 @@ public class GameRenderer {
         shapeRenderer.setColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f, 1);
         shapeRenderer.rect(holdBlockArea.x, holdBlockArea.y, GameWorld.BLOCK_SIZE * 4, GameWorld.BLOCK_SIZE * 4);
 
+        //Power up area
+        Point powerUpArea = PlayerSettings.getSettings(player.getId()).getPowerUpArea();
+        shapeRenderer.setColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f, 1);
+        shapeRenderer.rect(powerUpArea.x, powerUpArea.y, GameWorld.BLOCK_SIZE * 4, GameWorld.BLOCK_SIZE * 4);
 
         //GridOverlay
         shapeRenderer.end();

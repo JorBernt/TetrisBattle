@@ -1,4 +1,4 @@
-package Tools;
+package com.jbgames.tetrisbattle.Tools;
 
 import com.jbgames.tetrisbattle.Controllers.PlayerSettings;
 import com.jbgames.tetrisbattle.GameWorld.GameWorld;

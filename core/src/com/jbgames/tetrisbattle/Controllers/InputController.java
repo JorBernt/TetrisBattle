@@ -7,12 +7,12 @@ import com.jbgames.tetrisbattle.GameWorld.GameWorld;
 public class InputController implements InputProcessor {
 
     private final GameWorld world;
-    private final Player player1, player2;
+    private final PlayerController player1, player2;
 
     public InputController(GameWorld world) {
         this.world = world;
-        player1 = world.getPlayer(1);
-        player2 = world.getPlayer(2);
+        player1 = world.getPlayer(1).getPlayerController();
+        player2 = world.getPlayer(2).getPlayerController();
     }
 
     @Override
@@ -20,51 +20,9 @@ public class InputController implements InputProcessor {
         if(world.getCurrentState() == GameWorld.GameState.READY) {
             world.setCurrentState(GameWorld.GameState.COUNTDOWN);
         }
-        System.out.println(keycode);
         if(world.getCurrentState() == GameWorld.GameState.RUNNING) {
-            switch (keycode) {
-                case 51: //Left-Player rotate left
-                    player1.rotate(BlockTypes.Direction.LEFT);
-                    break;
-                case 47:
-                    player1.rotate(BlockTypes.Direction.RIGHT);
-                    //leftPlayer.move(BlockTypes.Direction.DOWN);
-                    break;
-                case 29:
-                    player1.move(BlockTypes.Direction.LEFT);
-                    break;
-                case 32:
-                    player1.move(BlockTypes.Direction.RIGHT);
-                    break;
-                case 62:
-                    player1.moveDown();
-                    break;
-                case 129:
-                    player1.holdBlock();
-                    break;
-
-                case 19: //Left-Player rotate left
-                    player2.rotate(BlockTypes.Direction.LEFT);
-                    break;
-                case 20:
-                    player2.rotate(BlockTypes.Direction.RIGHT);
-                    //leftPlayer.move(BlockTypes.Direction.DOWN);
-                    break;
-                case 21:
-                    player2.move(BlockTypes.Direction.LEFT);
-                    break;
-                case 22:
-                    player2.move(BlockTypes.Direction.RIGHT);
-                    break;
-                case 144:
-                    player2.moveDown();
-                    break;
-                case 130:
-                    player2.holdBlock();
-                    break;
-                case 59:
-                    player1.placeBlockInstant();
-            }
+            player1.keyPressed(keycode);
+            player2.keyPressed(keycode);
         }
         return false;
     }
@@ -72,12 +30,8 @@ public class InputController implements InputProcessor {
     @Override
     public boolean keyUp(int keycode) {
         if(world.getCurrentState() == GameWorld.GameState.RUNNING) {
-            if(keycode == 62) {
-                player1.moveDown();
-            }
-            if(keycode == 144) {
-                player2.moveDown();
-            }
+            player1.keyReleased(keycode);
+            player2.keyReleased(keycode);
         }
         return false;
     }

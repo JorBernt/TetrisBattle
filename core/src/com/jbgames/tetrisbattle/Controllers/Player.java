@@ -1,6 +1,6 @@
 package com.jbgames.tetrisbattle.Controllers;
 
-import Tools.Point;
+import com.jbgames.tetrisbattle.Tools.Point;
 import com.jbgames.tetrisbattle.Entities.Block;
 import com.jbgames.tetrisbattle.Entities.BlockTypes;
 import com.jbgames.tetrisbattle.GameWorld.GameWorld;
@@ -18,14 +18,18 @@ public class Player {
     private final BlockTypes[][] playerGrid;
     private final Block activeBlock;
     private final Point[][] gridPos;
-    private final int TIMER = 40;
-    private int timer = TIMER;
+
     private final Queue<Block> blockQueue;
-    private boolean downPressed;
-    private int downTimer;
-    private final int DOWNTIMER = 5;
     private Block holdBlock, ghostBlock;
     private int score;
+
+    private final float FALLDOWN_TIMER = 1f;
+    private float fallDownTimer = FALLDOWN_TIMER;
+
+    private final float MOVE_STEP_TIMER = 0.1f;
+    private float moveStepTimer = 0;
+
+    private final PlayerController playerController;
 
     public Player(int id, GameWorld world) {
         this.id = id;
@@ -33,8 +37,6 @@ public class Player {
         this.gridPos = new Point[21][10];
         this.world = world;
         score = 0;
-        downPressed = false;
-        downTimer = DOWNTIMER;
         blockQueue = new LinkedList<>();
         holdBlock = new Block(BlockTypes.NONE, this);
 
@@ -52,15 +54,25 @@ public class Player {
         activeBlock = new Block(world.getNewBlock(), this, gridPos[0][5]);
         ghostBlock = new Block(activeBlock.getType(), this, true);
 
+        playerController = new PlayerController(PlayerSettings.getSettings(id), this);
     }
 
     public void update(float delta) {
         updateGhost();
         fallDown(delta);
-        if(downPressed) {
-            move(BlockTypes.Direction.DOWN);
-            downTimer -= 1*delta;
+
+        //Controls
+        if(playerController.isDownPressed()) {
+            move(BlockTypes.Direction.DOWN, delta);
         }
+        else if(playerController.isLeftPressed()) {
+            move(BlockTypes.Direction.LEFT, delta);
+        }
+        else if(playerController.isRightPressed()) {
+            move(BlockTypes.Direction.RIGHT, delta);
+        }
+        else moveStepTimer = 0f;
+
         checkForFullLines(true);
     }
 
@@ -73,12 +85,6 @@ public class Player {
         }
     }
 
-    public void moveDown() {
-        downPressed = !downPressed;
-        if(!downPressed) {
-            downTimer = DOWNTIMER;
-        }
-    }
 
     public void rotate(BlockTypes.Direction direction) {
         activeBlock.rotate(direction);
@@ -107,26 +113,26 @@ public class Player {
         }
     }
 
-    public void move(BlockTypes.Direction direction) {
-        switch (direction) {
-            case LEFT:
-                if (canMoveBlock(activeBlock, BlockTypes.Direction.LEFT))
-                    activeBlock.move(BlockTypes.Direction.LEFT);
-                break;
-            case RIGHT:
-                if (canMoveBlock(activeBlock, BlockTypes.Direction.RIGHT))
-                    activeBlock.move(BlockTypes.Direction.RIGHT);
-                break;
-            case DOWN:
-                if (canMoveBlock(activeBlock, BlockTypes.Direction.DOWN)) {
-                    if(downTimer <= 0) {
+    public void move(BlockTypes.Direction direction, float delta) {
+        if(moveStepTimer <= 0) {
+            switch (direction) {
+                case LEFT:
+                    if (canMoveBlock(activeBlock, BlockTypes.Direction.LEFT))
+                        activeBlock.move(BlockTypes.Direction.LEFT);
+                    break;
+                case RIGHT:
+                    if (canMoveBlock(activeBlock, BlockTypes.Direction.RIGHT))
+                        activeBlock.move(BlockTypes.Direction.RIGHT);
+                    break;
+                case DOWN:
+                    if (canMoveBlock(activeBlock, BlockTypes.Direction.DOWN)) {
                         activeBlock.move(BlockTypes.Direction.DOWN);
-                        downTimer = DOWNTIMER;
-                    }
-                }
-                else activeBlock.setToBePlaced(true);
-                break;
+                    } else activeBlock.setToBePlaced(true);
+                    break;
+            }
+            moveStepTimer = MOVE_STEP_TIMER;
         }
+        moveStepTimer -= delta;
     }
 
     public void placeBlockInstant() {
@@ -140,25 +146,24 @@ public class Player {
     private void fallDown(float delta) {
             if (!activeBlock.isToBePlaced() || !collision(activeBlock)) {
                 if(canMoveBlock(activeBlock, BlockTypes.Direction.DOWN)) {
-                    if(timer <= 0) {
+                    if(fallDownTimer <= 0) {
                         activeBlock.move(BlockTypes.Direction.DOWN);
-                        timer = TIMER;
+                        fallDownTimer = FALLDOWN_TIMER;
                     }
                     activeBlock.setToBePlaced(false);
                 }
-
             } else {
-                if(timer <= 0) {
+                if(fallDownTimer <= 0) {
                     placeBlock(activeBlock, playerGrid);
                     activeBlock.setToBePlaced(true);
                     activeBlock.nextBlock(nextBlock());
-                    timer = TIMER;
+                    fallDownTimer = FALLDOWN_TIMER;
                 }
             }
             if (collision(activeBlock)) {
                 activeBlock.setToBePlaced(true);
             }
-        timer -= 1 * delta;
+        fallDownTimer -= delta;
     }
 
     private BlockTypes nextBlock() {
@@ -173,8 +178,6 @@ public class Player {
             playerGrid[gridPos.y][gridPos.x] = block.getType();
         }
     }
-
-
 
     public boolean collision(Block block) {
         for (Point pos : block.getBlocks()) {
@@ -231,10 +234,12 @@ public class Player {
                 }
             }
         }
-
-        score += 100 * numberOfClearedLines * numberOfClearedLines;
+        updateScore(numberOfClearedLines);
     }
 
+    public void updateScore(int numberOfClearedLines) {
+        score += 100 * numberOfClearedLines * numberOfClearedLines;
+    }
 
     public int getId() {
         return id;
@@ -260,5 +265,9 @@ public class Player {
 
     public int getScore() {
         return score;
+    }
+
+    public PlayerController getPlayerController() {
+        return playerController;
     }
 }
