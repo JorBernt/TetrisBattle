@@ -19,6 +19,10 @@ public class InputController implements InputProcessor {
         if(world.getCurrentState() == GameWorld.GameState.READY) {
             world.setCurrentState(GameWorld.GameState.COUNTDOWN);
         }
+        if(world.getCurrentState() == GameWorld.GameState.GAMEOVER) {
+            world.setCurrentState(GameWorld.GameState.READY);
+            world.reset();
+        }
         if(world.getCurrentState() == GameWorld.GameState.RUNNING) {
             player1.keyPressed(keycode);
             player2.keyPressed(keycode);

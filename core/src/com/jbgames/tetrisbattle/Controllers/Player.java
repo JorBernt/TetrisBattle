@@ -14,10 +14,10 @@ public class Player {
     private final int id;
     private final GameWorld world;
     private final BlockTypes[][] playerGrid;
-    private final Block activeBlock;
+    private Block activeBlock;
     private final Point[][] gridPos;
 
-    private final Queue<Block> blockQueue;
+    private Queue<Block> blockQueue;
     private Block holdBlock, ghostBlock;
     private int score;
 
@@ -27,24 +27,27 @@ public class Player {
     private final float MOVE_STEP_TIMER = 0.1f;
     private float moveStepTimer = 0;
 
+    private final float POPUP_TIMER = 2f;
+    private float popUpTimer = POPUP_TIMER;
+    private boolean showPopUp;
+    private float popUpAnimation = 0f;
+
     private final PlayerController playerController;
 
     private PowerUp.Item powerUp;
+    private String popUp;
 
     public Player(int id, GameWorld world) {
         this.id = id;
         this.playerGrid = new BlockTypes[21][10];
         this.gridPos = new Point[21][10];
         this.world = world;
-        score = 0;
+        initObjects();
+        playerController = new PlayerController(PlayerSettings.getSettings(id), this);
+    }
+
+    private void initObjects() {
         blockQueue = new LinkedList<>();
-        holdBlock = new Block(BlockTypes.NONE, this);
-        powerUp = PowerUp.Item.NONE;
-
-        for (int i = 0; i < 4; i++) {
-            blockQueue.add(new Block(world.getNewBlock(), this, new Point(30, 400)));
-        }
-
         for (int i = 0; i < 21; i++) {
             for (int j = 0; j < 10; j++) {
                 playerGrid[i][j] = BlockTypes.NONE;
@@ -52,15 +55,32 @@ public class Player {
                         i * GameWorld.BLOCK_SIZE + PlayerSettings.getSettings(id).getGridPosOffset().y);
             }
         }
+        for (int i = 0; i < 4; i++) {
+            blockQueue.add(new Block(world.getNewBlock(), this, new Point(30, 400)));
+        }
         activeBlock = new Block(world.getNewBlock(), this, gridPos[0][5]);
         ghostBlock = new Block(activeBlock.getType(), this, true);
-
-        playerController = new PlayerController(PlayerSettings.getSettings(id), this);
+        score = 0;
+        holdBlock = new Block(BlockTypes.NONE, this);
+        powerUp = PowerUp.Item.INSTANT_FALL;
+        popUp = "";
+        showPopUp = false;
     }
 
     public void update(float delta) {
         updateGhost();
         fallDown(delta);
+
+        if(showPopUp) {
+            if(popUpTimer <= 0) {
+                popUp = "";
+                popUpTimer = POPUP_TIMER;
+                showPopUp = false;
+                popUpAnimation = 0f;
+            }
+            popUpAnimation += 20*delta;
+            popUpTimer -= delta;
+        }
 
         //Controls
         if(playerController.isDownPressed()) {
@@ -142,6 +162,7 @@ public class Player {
         }
         placeBlock(activeBlock, playerGrid);
         activeBlock.nextBlock(nextBlock());
+
     }
 
     private void fallDown(float delta) {
@@ -159,6 +180,9 @@ public class Player {
                     activeBlock.setToBePlaced(true);
                     activeBlock.nextBlock(nextBlock());
                     fallDownTimer = FALLDOWN_TIMER;
+                    if(collision(activeBlock)) {
+                        world.setCurrentState(GameWorld.GameState.GAMEOVER);
+                    }
                 }
             }
             if (collision(activeBlock)) {
@@ -181,8 +205,11 @@ public class Player {
     }
 
     public void useItem() {
-        PowerUp.useItem(this, world.getPlayer(id==1?2:1), powerUp);
-        powerUp = PowerUp.Item.NONE;
+        if(powerUp != PowerUp.Item.NONE) {
+            PowerUp.useItem(this, world.getPlayer(id==1?2:1), powerUp);
+
+            powerUp = PowerUp.Item.NONE;
+        }
     }
 
     public boolean collision(Block block) {
@@ -244,12 +271,27 @@ public class Player {
         addPowerUp(numberOfClearedLines);
     }
 
+    public void attacked(PowerUp.Item item) {
+        popUp = item.getName();
+        showPopUp = true;
+        switch (item) {
+            case INSTANT_FALL:
+                placeBlockInstant();
+                break;
+        }
+    }
+
     private void addPowerUp(int numberOfClearedLines) {
         powerUp = PowerUp.Item.INSTANT_FALL;
     }
 
     private void updateScore(int numberOfClearedLines) {
         score += 100 * numberOfClearedLines * numberOfClearedLines;
+    }
+
+    public void reset() {
+        score = 0;
+        initObjects();
     }
 
     public int getId() {
@@ -284,5 +326,13 @@ public class Player {
 
     public PowerUp.Item getPowerUp() {
         return powerUp;
+    }
+
+    public String getPopUp() {
+        return popUp;
+    }
+
+    public float getPopUpAnimation() {
+        return popUpAnimation;
     }
 }

@@ -22,12 +22,9 @@ public class PowerUp {
     public static void useItem(Player attacker, Player target, Item item) {
         switch (item) {
             case INSTANT_FALL:
-                instantFall(target);
+                target.attacked(item);
                 break;
         }
     }
 
-    private static void instantFall(Player target) {
-        target.placeBlockInstant();
-    }
 }

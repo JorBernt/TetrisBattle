@@ -18,7 +18,7 @@ public class GameWorld {
 
     private GameState currentState;
     public enum GameState {
-        READY, COUNTDOWN, RUNNING, GAMEOVER, HIGHSCORE
+        READY, COUNTDOWN, RUNNING, GAMEOVER, HIGHSCORE;
     }
 
     public GameWorld () {
@@ -44,16 +44,18 @@ public class GameWorld {
             case RUNNING:
                 updateRunning(delta);
                 break;
+            case GAMEOVER:
+                updateGameOver(delta);
+                break;
         }
-
     }
 
-    public void updateRunning(float delta) {
+    private void updateRunning(float delta) {
         player1.update(delta);
         player2.update(delta);
     }
 
-    public void updateCountDown(float delta) {
+    private void updateCountDown(float delta) {
         countDown -= delta;
         if(countDown <= 0) {
             countDown = 3f;
@@ -61,9 +63,20 @@ public class GameWorld {
         }
     }
 
-    public void updateReady(float delta) {
+    private void updateReady(float delta) {
 
     }
+
+    private void updateGameOver(float delta) {
+
+    }
+
+    public void reset() {
+        player1.reset();
+        player2.reset();
+    }
+
+
 
     public BlockTypes getNewBlock() {
         return types.get(random.nextInt(types.size()));

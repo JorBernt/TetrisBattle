@@ -173,6 +173,7 @@ public class Block {
         position.y = startPosY;
         position.x = startPosX;
         toBePlaced = false;
+
     }
 
 

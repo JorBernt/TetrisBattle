@@ -51,16 +51,29 @@ public class GameRenderer {
             case RUNNING:
                 renderRunning(state);
                 break;
+            case GAMEOVER:
+                renderGameOver();
+                break;
         }
     }
 
-    public void renderReady() {
+    private void renderReady() {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(55 / 255.0f, 80 / 255.0f, 100 / 255.0f, 1);
         shapeRenderer.rect(0, 0, TetrisBattle.V_WIDTH, TetrisBattle.V_HEIGHT);
         shapeRenderer.end();
         batch.begin();
         hud.draw("Press any key to start!", Hud.TextType.CENTER_SCREEN, -500, 0, batch, Hud.TextSize.BIG);
+        batch.end();
+    }
+
+    private void renderGameOver() {
+        renderRunning(GameWorld.GameState.GAMEOVER);
+
+        batch.begin();
+        hud.draw("Game Over!", Hud.TextType.CENTER_SCREEN, -500, 0, batch, Hud.TextSize.BIG);
+        String winner = player1.getScore() > player2.getScore() ? "Player 1" : "Player 2";
+        hud.draw(winner + " won with a score of " + Math.max(player1.getScore(), player2.getScore()), Hud.TextType.CENTER_SCREEN, -500, 100, batch, Hud.TextSize.BIG);
         batch.end();
     }
 
@@ -108,12 +121,12 @@ public class GameRenderer {
         hud.draw(Integer.toString(player2.getScore()), Hud.TextType.PLAYER2_SCORE, batch, Hud.TextSize.BIG);
         hud.draw(player1.getPowerUp().getName(), Hud.TextType.PLAYER1_POWERUP, batch, Hud.TextSize.SMALL);
         hud.draw(player2.getPowerUp().getName(), Hud.TextType.PLAYER2_POWERUP, batch, Hud.TextSize.SMALL);
+        hud.draw(player1.getPopUp(), Hud.TextType.PLAYER1_POWERUP_POPUP, 0, player1.getPopUpAnimation(), batch, Hud.TextSize.MEDIUM);
+        hud.draw(player2.getPopUp(), Hud.TextType.PLAYER2_POWERUP_POPUP, 0, player2.getPopUpAnimation(), batch, Hud.TextSize.MEDIUM);
         if (state == GameWorld.GameState.COUNTDOWN) {
             hud.draw(world.getCountDown(), Hud.TextType.CENTER_SCREEN, batch, Hud.TextSize.BIG);
         }
         batch.end();
-
-
     }
 
 
@@ -128,7 +141,6 @@ public class GameRenderer {
             }
             blockRenderer(area.x + block.x + offset, area.y + block.y, color, 1f);
         }
-
     }
 
     private void renderBlockQueue(Player player) {
