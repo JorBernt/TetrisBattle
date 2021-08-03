@@ -121,8 +121,13 @@ public class GameRenderer {
         hud.draw(Integer.toString(player2.getScore()), Hud.TextType.PLAYER2_SCORE, batch, Hud.TextSize.BIG);
         hud.draw(player1.getPowerUp().getName(), Hud.TextType.PLAYER1_POWERUP, batch, Hud.TextSize.SMALL);
         hud.draw(player2.getPowerUp().getName(), Hud.TextType.PLAYER2_POWERUP, batch, Hud.TextSize.SMALL);
+
+        if(player1.showPopUp())
         hud.draw(player1.getPopUp(), Hud.TextType.PLAYER1_POWERUP_POPUP, 0, player1.getPopUpAnimation(), batch, Hud.TextSize.MEDIUM);
+
+        if(player2.showPopUp())
         hud.draw(player2.getPopUp(), Hud.TextType.PLAYER2_POWERUP_POPUP, 0, player2.getPopUpAnimation(), batch, Hud.TextSize.MEDIUM);
+
         if (state == GameWorld.GameState.COUNTDOWN) {
             hud.draw(world.getCountDown(), Hud.TextType.CENTER_SCREEN, batch, Hud.TextSize.BIG);
         }

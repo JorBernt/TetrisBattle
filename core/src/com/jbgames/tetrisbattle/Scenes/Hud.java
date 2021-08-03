@@ -12,8 +12,8 @@ public class Hud {
         CENTER_SCREEN (TetrisBattle.V_WIDTH/2, TetrisBattle.V_HEIGHT/2),
         PLAYER1_SCORE(100, 100),
         PLAYER2_SCORE(1100, 100),
-        PLAYER1_POWERUP_POPUP(300,700),
-        PLAYER2_POWERUP_POPUP(1300,700),
+        PLAYER1_POWERUP_POPUP(200,700),
+        PLAYER2_POWERUP_POPUP(1200,700),
         PLAYER1_POWERUP(PlayerSettings.getSettings(1).getPowerUpArea().x+20, PlayerSettings.getSettings(1).getPowerUpArea().y+100),
         PLAYER2_POWERUP(PlayerSettings.getSettings(2).getPowerUpArea().x+20, PlayerSettings.getSettings(2).getPowerUpArea().y+100);
 

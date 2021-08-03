@@ -22,6 +22,8 @@ public class Player {
     private int score;
 
     private final float FALLDOWN_TIMER = 1f;
+    private float fallDownSpeedUp;
+    private float gameTimeCounter;
     private float fallDownTimer = FALLDOWN_TIMER;
 
     private final float MOVE_STEP_TIMER = 0.1f;
@@ -42,11 +44,11 @@ public class Player {
         this.playerGrid = new BlockTypes[21][10];
         this.gridPos = new Point[21][10];
         this.world = world;
-        initObjects();
+        init();
         playerController = new PlayerController(PlayerSettings.getSettings(id), this);
     }
 
-    private void initObjects() {
+    private void init() {
         blockQueue = new LinkedList<>();
         for (int i = 0; i < 21; i++) {
             for (int j = 0; j < 10; j++) {
@@ -61,6 +63,8 @@ public class Player {
         activeBlock = new Block(world.getNewBlock(), this, gridPos[0][5]);
         ghostBlock = new Block(activeBlock.getType(), this, true);
         score = 0;
+        gameTimeCounter = 0;
+        fallDownSpeedUp = 0.1f;
         holdBlock = new Block(BlockTypes.NONE, this);
         powerUp = PowerUp.Item.INSTANT_FALL;
         popUp = "";
@@ -70,10 +74,17 @@ public class Player {
     public void update(float delta) {
         updateGhost();
         fallDown(delta);
+        gameTimeCounter += delta;
+        if(gameTimeCounter > 20) {
+            fallDownSpeedUp += 0.1f;
+            fallDownSpeedUp = Math.min(0.8f, fallDownSpeedUp);
+            gameTimeCounter = 0f;
+            popUp = "Speed up!";
+            showPopUp = true;
+        }
 
         if(showPopUp) {
             if(popUpTimer <= 0) {
-                popUp = "";
                 popUpTimer = POPUP_TIMER;
                 showPopUp = false;
                 popUpAnimation = 0f;
@@ -170,7 +181,7 @@ public class Player {
                 if(canMoveBlock(activeBlock, BlockTypes.Direction.DOWN)) {
                     if(fallDownTimer <= 0) {
                         activeBlock.move(BlockTypes.Direction.DOWN);
-                        fallDownTimer = FALLDOWN_TIMER;
+                        fallDownTimer = FALLDOWN_TIMER-fallDownSpeedUp;
                     }
                     activeBlock.setToBePlaced(false);
                 }
@@ -179,7 +190,7 @@ public class Player {
                     placeBlock(activeBlock, playerGrid);
                     activeBlock.setToBePlaced(true);
                     activeBlock.nextBlock(nextBlock());
-                    fallDownTimer = FALLDOWN_TIMER;
+                    fallDownTimer = FALLDOWN_TIMER-fallDownSpeedUp;
                     if(collision(activeBlock)) {
                         world.setCurrentState(GameWorld.GameState.GAMEOVER);
                     }
@@ -207,7 +218,6 @@ public class Player {
     public void useItem() {
         if(powerUp != PowerUp.Item.NONE) {
             PowerUp.useItem(this, world.getPlayer(id==1?2:1), powerUp);
-
             powerUp = PowerUp.Item.NONE;
         }
     }
@@ -272,7 +282,7 @@ public class Player {
     }
 
     public void attacked(PowerUp.Item item) {
-        popUp = item.getName();
+        popUp = "Opponent used " + item.getName() + "!";
         showPopUp = true;
         switch (item) {
             case INSTANT_FALL:
@@ -283,6 +293,8 @@ public class Player {
 
     private void addPowerUp(int numberOfClearedLines) {
         powerUp = PowerUp.Item.INSTANT_FALL;
+        popUp = "You got " + powerUp.getName() + "!";
+        showPopUp = true;
     }
 
     private void updateScore(int numberOfClearedLines) {
@@ -291,7 +303,7 @@ public class Player {
 
     public void reset() {
         score = 0;
-        initObjects();
+        init();
     }
 
     public int getId() {
@@ -330,6 +342,10 @@ public class Player {
 
     public String getPopUp() {
         return popUp;
+    }
+
+    public boolean showPopUp() {
+        return showPopUp;
     }
 
     public float getPopUpAnimation() {
