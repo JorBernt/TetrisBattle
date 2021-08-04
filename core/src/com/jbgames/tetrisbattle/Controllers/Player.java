@@ -190,8 +190,7 @@ public class Player {
                     } else activeBlock.setToBePlaced(true);
                     break;
             }
-            float MOVE_STEP_TIMER = 0.1f;
-            moveStepTimer = MOVE_STEP_TIMER;
+            moveStepTimer = 0.1f;
         }
         moveStepTimer -= delta;
     }
@@ -210,7 +209,7 @@ public class Player {
             if (canMoveBlock(activeBlock, BlockTypes.Direction.DOWN)) {
                 if (fallDownTimer <= 0) {
                     activeBlock.move(BlockTypes.Direction.DOWN);
-                    fallDownTimer = FALLDOWN_TIMER - fallDownSpeedUp;
+                    resetFallDownTimer();
                 }
                 activeBlock.setToBePlaced(false);
             }
@@ -219,7 +218,7 @@ public class Player {
                 placeBlock(activeBlock, playerGrid);
                 activeBlock.setToBePlaced(true);
                 activeBlock.nextBlock(nextBlock());
-                fallDownTimer = FALLDOWN_TIMER - fallDownSpeedUp;
+                resetFallDownTimer();
                 if (collision(activeBlock)) {
                     world.setCurrentState(GameWorld.GameState.GAMEOVER);
                 }
@@ -229,6 +228,10 @@ public class Player {
             activeBlock.setToBePlaced(true);
         }
         fallDownTimer -= delta;
+    }
+
+    private void resetFallDownTimer() {
+        fallDownTimer = FALLDOWN_TIMER - fallDownSpeedUp;
     }
 
     private BlockTypes nextBlock() {
@@ -300,9 +303,7 @@ public class Player {
             }
             if (wipe) {
                 for (int i = n; i < 20; i++) {
-                    for (int j = 0; j < 10; j++) {
-                        playerGrid[i][j] = playerGrid[i + 1][j];
-                    }
+                    System.arraycopy(playerGrid[i + 1], 0, playerGrid[i], 0, 10);
                 }
             }
         }
@@ -318,6 +319,7 @@ public class Player {
     }
 
     private void addPowerUp(int numberOfClearedLines) {
+        if(powerUp != PowerUp.Item.NONE) return;
         PowerUp.Item[] powerUps = PowerUp.Item.values();
         powerUp = powerUps[random.nextInt(powerUps.length-1)+1];
         popUp = "You got " + powerUp.getName() + "!";

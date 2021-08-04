@@ -1,6 +1,5 @@
 package com.jbgames.tetrisbattle.Controllers;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.jbgames.tetrisbattle.GameWorld.GameWorld;

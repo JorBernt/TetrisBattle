@@ -26,7 +26,7 @@ public class Point {
         this.x = x;
         this.playerID = playerID;
         settings = PlayerSettings.getSettings(playerID);
-        pointOffset = settings.getOffset();
+        pointOffset = settings.getPlayAreaOffset();
     }
 
 

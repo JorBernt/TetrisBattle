@@ -4,8 +4,16 @@ import com.jbgames.tetrisbattle.Tools.Point;
 import com.badlogic.gdx.Input;
 
 public enum PlayerSettings {
-    PLAYER_1(new Point(200, 100), new Point(480, 780), new Point(650, 300), new Point(20,700), new Point(20,400)),
-    PLAYER_2(new Point(1200, 100), new Point(1520, 780), new Point(1650, 300), new Point(1020, 700), new Point(1020, 400));
+    PLAYER_1(new Point(200, 100),
+            new Point(480, 780),
+            new Point(650, 300),
+            new Point(20,700),
+            new Point(20,400)),
+    PLAYER_2(new Point(1200, 100),
+            new Point(1520, 780),
+            new Point(1650, 300),
+            new Point(1020, 700),
+            new Point(1020, 400));
 
     private final Point playAreaOffset, gridPosOffset, nextBlockArea, holdArea, powerUpArea;
 
@@ -36,7 +44,7 @@ public enum PlayerSettings {
 
     }
 
-    public Point getOffset() {
+    public Point getPlayAreaOffset() {
         return playAreaOffset;
     }
 

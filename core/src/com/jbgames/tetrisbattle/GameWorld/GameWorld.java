@@ -2,7 +2,6 @@ package com.jbgames.tetrisbattle.GameWorld;
 
 
 import com.jbgames.tetrisbattle.Controllers.Player;
-import com.jbgames.tetrisbattle.Controllers.PlayerSettings;
 import com.jbgames.tetrisbattle.Entities.BlockTypes;
 
 import java.util.*;

@@ -163,7 +163,7 @@ public class GameRenderer {
 
     private void renderAreas(Player player) {
         //Main area
-        Point mainArea = PlayerSettings.getSettings(player.getId()).getOffset();
+        Point mainArea = PlayerSettings.getSettings(player.getId()).getPlayAreaOffset();
         shapeRenderer.setColor(player.itemAffectGameScreen() ? Color.CORAL : Color.LIGHT_GRAY);
         shapeRenderer.rect(mainArea.x, mainArea.y, GameWorld.BLOCK_SIZE * 10, GameWorld.BLOCK_SIZE * 21);
         //Next block area
@@ -186,11 +186,11 @@ public class GameRenderer {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(Color.BLACK);
         for (int i = 0; i < 21; i++) {
-            Point pos = PlayerSettings.getSettings(player.getId()).getOffset();
+            Point pos = PlayerSettings.getSettings(player.getId()).getPlayAreaOffset();
             shapeRenderer.line(pos.x, pos.y + GameWorld.BLOCK_SIZE * i, pos.x + GameWorld.BLOCK_SIZE * 10, pos.y + GameWorld.BLOCK_SIZE * i);
         }
         for (int i = 0; i < 10; i++) {
-            Point pos = PlayerSettings.getSettings(player.getId()).getOffset();
+            Point pos = PlayerSettings.getSettings(player.getId()).getPlayAreaOffset();
             shapeRenderer.line(pos.x + GameWorld.BLOCK_SIZE * i, pos.y, pos.x + GameWorld.BLOCK_SIZE * i, pos.y + GameWorld.BLOCK_SIZE * 21);
         }
         shapeRenderer.end();

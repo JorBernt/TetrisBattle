@@ -5,7 +5,6 @@ import com.badlogic.gdx.Screen;
 import com.jbgames.tetrisbattle.Controllers.InputController;
 import com.jbgames.tetrisbattle.GameWorld.GameRenderer;
 import com.jbgames.tetrisbattle.GameWorld.GameWorld;
-import com.jbgames.tetrisbattle.Scenes.Hud;
 import com.jbgames.tetrisbattle.TetrisBattle;
 
 public class GameScreen implements Screen {
