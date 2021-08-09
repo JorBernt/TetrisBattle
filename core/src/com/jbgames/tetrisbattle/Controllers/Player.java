@@ -34,7 +34,8 @@ public class Player {
     private boolean showPopUp;
     private float popUpAnimation = 0f;
 
-    private float itemDurability;
+    private float itemDuration;
+    private float maxItemDuration;
     private boolean itemActive;
     private PowerUp.Item item;
 
@@ -105,12 +106,12 @@ public class Player {
         }
 
         if (itemActive) {
-            if (itemDurability <= 0) {
+            if (itemDuration <= 0) {
                 itemActive = false;
                 item = PowerUp.Item.NONE;
                 itemAffectGameScreen = false;
             }
-            itemDurability -= delta;
+            itemDuration -= delta;
         }
 
         //Controls
@@ -314,7 +315,8 @@ public class Player {
 
     public void activateItem(PowerUp.Item item, float durability) {
         this.item = item;
-        itemDurability = durability;
+        itemDuration = durability;
+        maxItemDuration = itemDuration;
         itemActive = true;
     }
 
@@ -393,6 +395,10 @@ public class Player {
 
     public void setItemAffectGameScreen(boolean value) {
         itemAffectGameScreen = value;
+    }
+
+    public float getRemainingItemDuration() {
+        return (itemDuration/maxItemDuration);
     }
 
     public void setPopUp(String text) {

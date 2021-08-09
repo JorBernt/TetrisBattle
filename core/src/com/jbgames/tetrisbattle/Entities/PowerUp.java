@@ -3,20 +3,20 @@ package com.jbgames.tetrisbattle.Entities;
 
 import com.jbgames.tetrisbattle.Controllers.Player;
 
-public class PowerUp {
+public abstract class PowerUp {
 
     public enum Item {
         NONE("NONE"),
         INSTANT_FALL("Instant\nFall"),
         MIRROR("Mirror"),
         NO_ROTATION("No\nRotation"),
-        SWAP("Swap");
+        SWAP("Swap"),
+        ;
 
         String name;
         Item(String name) {
             this.name = name;
         }
-
         public String getName() {
             return name;
         }

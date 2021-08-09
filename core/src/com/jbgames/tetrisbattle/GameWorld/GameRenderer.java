@@ -78,8 +78,6 @@ public class GameRenderer {
     }
 
     public void renderRunning(GameWorld.GameState state) {
-
-
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(55 / 255.0f, 80 / 255.0f, 100 / 255.0f, 1);
         shapeRenderer.rect(0, 0, TetrisBattle.V_WIDTH, TetrisBattle.V_HEIGHT);
@@ -164,8 +162,15 @@ public class GameRenderer {
     private void renderAreas(Player player) {
         //Main area
         Point mainArea = PlayerSettings.getSettings(player.getId()).getPlayAreaOffset();
-        shapeRenderer.setColor(player.itemAffectGameScreen() ? Color.CORAL : Color.LIGHT_GRAY);
+        shapeRenderer.setColor(Color.LIGHT_GRAY);
         shapeRenderer.rect(mainArea.x, mainArea.y, GameWorld.BLOCK_SIZE * 10, GameWorld.BLOCK_SIZE * 21);
+
+        if(player.itemAffectGameScreen()) {
+            shapeRenderer.setColor(Color.CORAL);
+            shapeRenderer.rect(mainArea.x, mainArea.y, GameWorld.BLOCK_SIZE * 10 * player.getRemainingItemDuration(), GameWorld.BLOCK_SIZE * 21);
+
+        }
+
         //Next block area
         Point nextBlockArea = PlayerSettings.getSettings(player.getId()).getNextBlockArea();
         shapeRenderer.setColor(150 / 255.0f, 150 / 255.0f, 150 / 255.0f, 1);
@@ -208,7 +213,6 @@ public class GameRenderer {
     private void renderGhost(Player player) {
         Block playerBlock = player.getGhostBlock();
         Color color = playerBlock.getColor();
-
         for (Point block : playerBlock.getBlocks()) {
             blockRenderer(block.x, block.y, color, 0.4f);
         }

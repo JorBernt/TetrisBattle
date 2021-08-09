@@ -9,7 +9,7 @@ import java.util.*;
 public class GameWorld {
 
     public static final int BLOCK_SIZE = 40;
-    private Player player1, player2;
+    private final Player player1, player2;
     private final Random random;
     private final List<BlockTypes> types;
     private float countDown = 3f;
@@ -105,4 +105,6 @@ public class GameWorld {
         if(countDown >= 1) return "SET!";
         else return "GO!";
     }
+
+
 }
