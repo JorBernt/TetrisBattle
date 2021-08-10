@@ -11,7 +11,8 @@ public abstract class PowerUp {
         MIRROR("Mirror"),
         NO_ROTATION("No\nRotation"),
         SWAP("Swap"),
-        ;
+        CLEAR_LINES("Clear\nLines"),
+        MAX_SPEED("Max\nSpeed");
 
         String name;
         Item(String name) {
@@ -41,6 +42,16 @@ public abstract class PowerUp {
             case NO_ROTATION:
                 target.setItemAffectGameScreen(true);
                 target.activateItem(item, 5f);
+                break;
+            case CLEAR_LINES:
+                attacker.setPopUp("You used " + item.getName() + "!");
+                attacker.setShowPopUp(true);
+                attacker.clearAllLines();
+                break;
+            case MAX_SPEED:
+                target.activateItem(item, 3f);
+                target.setItemAffectGameScreen(true);
+                break;
         }
     }
 

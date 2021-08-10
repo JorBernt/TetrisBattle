@@ -26,6 +26,7 @@ public class Player {
     private float fallDownSpeedUp;
     private float gameTimeCounter;
     private float fallDownTimer = FALLDOWN_TIMER;
+    private final float FALLDOWN_MAX_SPEED_TIMER = 0.2f;
 
     private float moveStepTimer = 0;
 
@@ -74,7 +75,7 @@ public class Player {
         gameTimeCounter = 0;
         fallDownSpeedUp = 0.1f;
         holdBlock = new Block(BlockTypes.NONE, this);
-        powerUp = PowerUp.Item.NONE;
+        powerUp = PowerUp.Item.MAX_SPEED;
         popUp = "";
         showPopUp = false;
         itemActive = false;
@@ -89,7 +90,7 @@ public class Player {
             fallDownSpeedUp += 0.1f;
             fallDownSpeedUp = Math.min(0.8f, fallDownSpeedUp);
             gameTimeCounter = 0f;
-            if(showPopUp) popUp += " Speed up!";
+            if (showPopUp) popUp += " Speed up!";
             else popUp = "Speed up!";
             showPopUp = true;
             popUpTimer = POPUP_TIMER;
@@ -137,7 +138,7 @@ public class Player {
 
 
     public void rotate(BlockTypes.Direction direction) {
-        if(item != PowerUp.Item.NO_ROTATION && !itemActive) {
+        if (item != PowerUp.Item.NO_ROTATION && !itemActive) {
             activeBlock.rotate(direction);
         }
     }
@@ -232,7 +233,10 @@ public class Player {
     }
 
     private void resetFallDownTimer() {
-        fallDownTimer = FALLDOWN_TIMER - fallDownSpeedUp;
+        if(!itemActive && item != PowerUp.Item.MAX_SPEED)
+            fallDownTimer = FALLDOWN_TIMER - fallDownSpeedUp;
+        else
+            fallDownTimer = FALLDOWN_MAX_SPEED_TIMER;
     }
 
     private BlockTypes nextBlock() {
@@ -308,8 +312,19 @@ public class Player {
                 }
             }
         }
-        updateScore(numberOfClearedLines);
+        updateScore(numberOfClearedLines, true);
         addPowerUp(numberOfClearedLines);
+    }
+
+    public void clearAllLines() {
+        int score = 0;
+        for (int i = 0; i < 20; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (playerGrid[i][j] != BlockTypes.NONE) score += 10;
+                playerGrid[i][j] = BlockTypes.NONE;
+            }
+        }
+        updateScore(score, false);
     }
 
 
@@ -318,18 +333,24 @@ public class Player {
         itemDuration = durability;
         maxItemDuration = itemDuration;
         itemActive = true;
+        if(item == PowerUp.Item.MAX_SPEED) {
+            resetFallDownTimer();
+        }
     }
 
     private void addPowerUp(int numberOfClearedLines) {
-        if(powerUp != PowerUp.Item.NONE) return;
+        if (powerUp != PowerUp.Item.NONE) return;
         PowerUp.Item[] powerUps = PowerUp.Item.values();
-        powerUp = powerUps[random.nextInt(powerUps.length-1)+1];
+        powerUp = powerUps[random.nextInt(powerUps.length - 1) + 1];
         popUp = "You got " + powerUp.getName() + "!";
         showPopUp = true;
     }
 
-    private void updateScore(int numberOfClearedLines) {
-        score += 100 * numberOfClearedLines * numberOfClearedLines;
+    private void updateScore(int value, boolean line) {
+        if (line)
+            score += 100 * value * value;
+        else
+            score += value;
     }
 
     public void reset() {
@@ -398,7 +419,7 @@ public class Player {
     }
 
     public float getRemainingItemDuration() {
-        return (itemDuration/maxItemDuration);
+        return (itemDuration / maxItemDuration);
     }
 
     public void setPopUp(String text) {
