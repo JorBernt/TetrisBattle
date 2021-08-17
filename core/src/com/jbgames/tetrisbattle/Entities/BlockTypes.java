@@ -12,7 +12,9 @@ public enum BlockTypes {
     REVERSE_SQUIGGLY(Color.YELLOW),
     SQUARE(Color.GREEN),
     NONE(Color.GRAY),
-    PLACED_BLOCK(Color.WHITE);
+    PLACED_BLOCK(Color.WHITE),
+    SOLID_BLOCK(Color.DARK_GRAY),
+    MONSTER(Color.GOLD);
 
 
     public enum Direction {
@@ -80,6 +82,13 @@ public enum BlockTypes {
                                 {0,1,1,0},
                                 {0,1,1,0},
                                 {0,0,0,0}};
+                break;
+            case MONSTER:
+                pos = new int[][]
+                                {{1,1,1,1},
+                                {0,1,1,0},
+                                {1,1,1,1},
+                                {1,0,0,1}};
                 break;
 
 

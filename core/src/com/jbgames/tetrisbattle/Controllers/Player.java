@@ -17,7 +17,8 @@ public class Player {
     private Block activeBlock;
     private final Point[][] gridPos;
 
-    private Queue<Block> blockQueue;
+    private Deque<Block> blockQueue;
+    private Queue<BlockTypes> blockHistory;
     private Block holdBlock, ghostBlock;
     private int score;
     private final Random random;
@@ -66,16 +67,26 @@ public class Player {
                         i * GameWorld.BLOCK_SIZE + PlayerSettings.getSettings(id).getGridPosOffset().y);
             }
         }
-        for (int i = 0; i < 4; i++) {
-            blockQueue.add(new Block(world.getNewBlock(), this, new Point(30, 400)));
-        }
+
+        blockHistory = new LinkedList<>();
+        blockHistory.add(BlockTypes.SQUIGGLY);
+        blockHistory.add(BlockTypes.SQUIGGLY);
+        blockHistory.add(BlockTypes.REVERSE_SQUIGGLY);
+        blockHistory.add(BlockTypes.REVERSE_SQUIGGLY);
+
         activeBlock = new Block(world.getNewBlock(), this, gridPos[0][4]);
         ghostBlock = new Block(activeBlock.getType(), this);
+        for (int i = 0; i < 4; i++) {
+            Block block = new Block(world.getNewBlock(blockHistory), this, new Point(30, 400));
+            blockQueue.add(block);
+            blockHistory.poll();
+            blockHistory.add(block.getType());
+        }
         score = 0;
         gameTimeCounter = 0;
         fallDownSpeedUp = 0.1f;
         holdBlock = new Block(BlockTypes.NONE, this);
-        powerUp = PowerUp.Item.MAX_SPEED;
+        powerUp = PowerUp.Item.MONSTER_BLOCK;
         popUp = "";
         showPopUp = false;
         itemActive = false;
@@ -233,16 +244,22 @@ public class Player {
     }
 
     private void resetFallDownTimer() {
-        if(!itemActive && item != PowerUp.Item.MAX_SPEED)
-            fallDownTimer = FALLDOWN_TIMER - fallDownSpeedUp;
-        else
+        if(itemActive && item == PowerUp.Item.MAX_SPEED)
             fallDownTimer = FALLDOWN_MAX_SPEED_TIMER;
+        else
+            fallDownTimer = FALLDOWN_TIMER - fallDownSpeedUp;
     }
 
     private BlockTypes nextBlock() {
         Block nextBlock = blockQueue.poll();
-        blockQueue.add(new Block(world.getNewBlock(), this, new Point(30, 400)));
+        blockQueue.add(new Block(world.getNewBlock(blockHistory), this, new Point(30, 400)));
+        addBlockHistory();
         return nextBlock.getType();
+    }
+
+    private void addBlockHistory() {
+        blockHistory.poll();
+        blockHistory.add(activeBlock.getType());
     }
 
     public void placeBlock(Block block, BlockTypes[][] playerGrid) {
@@ -254,8 +271,10 @@ public class Player {
 
     public void useItem() {
         if (powerUp != PowerUp.Item.NONE) {
-            PowerUp.useItem(this, world.getPlayer(id == 1 ? 2 : 1), powerUp);
-            powerUp = PowerUp.Item.NONE;
+            if(PowerUp.useItem(this, world.getPlayer(id == 1 ? 2 : 1), powerUp)) {
+                powerUp = PowerUp.Item.NONE;
+            }
+
         }
     }
 
@@ -271,7 +290,8 @@ public class Player {
 
     public boolean canMoveBlock(Block block, BlockTypes.Direction direction) {
         boolean canMove = true;
-        for (Point pos : block.getBlocks()) {
+        List<Point> blocks = block.getBlocks();
+        for (Point pos : blocks) {
             Point gridPos = pos.coordToGridConvert();
             if (direction == BlockTypes.Direction.LEFT && (gridPos.x == 0 || playerGrid[gridPos.y][gridPos.x - 1] != BlockTypes.NONE))
                 canMove = false;
@@ -289,7 +309,7 @@ public class Player {
         for (int i = 0; i < 21; i++) {
             boolean full = true;
             for (int j = 0; j < 10; j++) {
-                if (playerGrid[i][j] == BlockTypes.NONE) {
+                if (playerGrid[i][j] == BlockTypes.NONE || playerGrid[i][j] == BlockTypes.SOLID_BLOCK) {
                     full = false;
                     break;
                 }
@@ -327,6 +347,22 @@ public class Player {
         updateScore(score, false);
     }
 
+    public void addSolidLine() {
+        for(int i = 19; i > 0; i--) {
+            for(int j = 0; j < 10; j++) {
+                playerGrid[i+1][j] = playerGrid[i][j];
+            }
+        }
+        for(int i = 0; i < 10; i++) {
+            playerGrid[0][i] = BlockTypes.SOLID_BLOCK;
+        }
+    }
+
+    public void setNextBlock(BlockTypes type) {
+        blockQueue.poll();
+        blockQueue.addFirst(new Block(type, this, new Point(30, 400)));
+    }
+
 
     public void activateItem(PowerUp.Item item, float durability) {
         this.item = item;
@@ -351,6 +387,13 @@ public class Player {
             score += 100 * value * value;
         else
             score += value;
+    }
+
+    public void setNewBlockQueue(BlockTypes type) {
+        blockQueue.clear();
+        for(int i = 0; i < 4; i++) {
+            blockQueue.add(new Block(BlockTypes.I, this, new Point(30, 400)));
+        }
     }
 
     public void reset() {
@@ -422,7 +465,12 @@ public class Player {
         return (itemDuration / maxItemDuration);
     }
 
-    public void setPopUp(String text) {
+    public void setPopUp(String text, boolean show) {
         popUp = text;
+        showPopUp = show;
+    }
+
+    public boolean isAttacked() {
+        return itemActive;
     }
 }

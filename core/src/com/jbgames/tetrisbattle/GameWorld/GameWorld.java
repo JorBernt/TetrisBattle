@@ -25,7 +25,7 @@ public class GameWorld {
         random = new Random();
         types = new ArrayList<>();
         for(BlockTypes type : BlockTypes.values()) {
-            if(type != BlockTypes.NONE && type != BlockTypes.PLACED_BLOCK)
+            if(type != BlockTypes.NONE && type != BlockTypes.PLACED_BLOCK && type != BlockTypes.SOLID_BLOCK && type != BlockTypes.MONSTER)
             types.add(type);
         }
         player1 = new Player(1, this);
@@ -79,6 +79,30 @@ public class GameWorld {
 
     public BlockTypes getNewBlock() {
         return types.get(random.nextInt(types.size()));
+    }
+
+    public BlockTypes getNewBlock(Queue<BlockTypes> history) {
+        BlockTypes type = types.get(random.nextInt(types.size()));
+        boolean contains = false;
+        for(BlockTypes t : history) {
+            if (type.equals(t)) {
+                contains = true;
+                break;
+            }
+        }
+        if(!contains) return type;
+        for(int i = 0; i < 4; i++) {
+            BlockTypes newType = types.get(random.nextInt(types.size()));
+            contains = false;
+            for(BlockTypes t : history) {
+                if (newType.equals(t)) {
+                    contains = true;
+                    break;
+                }
+            }
+            if(!contains) return newType;
+        }
+        return type;
     }
 
 

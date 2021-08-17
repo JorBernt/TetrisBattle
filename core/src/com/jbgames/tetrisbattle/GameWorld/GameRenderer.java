@@ -69,11 +69,10 @@ public class GameRenderer {
 
     private void renderGameOver() {
         renderRunning(GameWorld.GameState.GAMEOVER);
-
         batch.begin();
-        hud.draw("Game Over!", Hud.TextType.CENTER_SCREEN, -500, 0, batch, Hud.TextSize.BIG);
+        hud.draw("Game Over! Press ESC to play again!", Hud.TextType.CENTER_SCREEN, -500, 0, batch, Hud.TextSize.BIG);
         String winner = player1.getScore() > player2.getScore() ? "Player 1" : "Player 2";
-        hud.draw(winner + " won with a score of " + Math.max(player1.getScore(), player2.getScore()), Hud.TextType.CENTER_SCREEN, -500, 100, batch, Hud.TextSize.BIG);
+        hud.draw(winner + " won with a score of " + Math.max(player1.getScore(), player2.getScore()) + "!", Hud.TextType.CENTER_SCREEN, -500, 100, batch, Hud.TextSize.BIG);
         batch.end();
     }
 
@@ -214,7 +213,7 @@ public class GameRenderer {
         Block playerBlock = player.getGhostBlock();
         Color color = playerBlock.getColor();
         for (Point block : playerBlock.getBlocks()) {
-            blockRenderer(block.x, block.y, color, 0.4f);
+            blockRenderer(block.x, block.y, color, 0.2f);
         }
     }
 

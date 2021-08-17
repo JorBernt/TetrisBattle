@@ -38,12 +38,11 @@ public class Block {
     }
 
     public void rotate(BlockTypes.Direction direction) {
-        int[][] temp = new int[blockLayout.length][blockLayout.length];
+        int[][] temp;
         temp = copyArray(blockLayout);
-
         switch (direction) {
             case LEFT: {
-                blockLayout = rotateCounterClockWise(blockLayout);
+                blockLayout = rotateClockWise(blockLayout);
                 switch (curDirection) {
                     case LEFT:
                         curDirection = BlockTypes.Direction.DOWN;
@@ -62,7 +61,7 @@ public class Block {
 
             }
             case RIGHT: {
-                blockLayout = rotateClockWise(blockLayout);
+                blockLayout = rotateCounterClockWise(blockLayout);
                 switch (curDirection) {
                     case LEFT:
                         curDirection = BlockTypes.Direction.UP;

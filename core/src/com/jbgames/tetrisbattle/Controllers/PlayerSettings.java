@@ -27,13 +27,13 @@ public enum PlayerSettings {
 
     public enum KeyBindings {
         LEFT(Input.Keys.J, Input.Keys.NUMPAD_4),
-        DOWN(Input.Keys.K, Input.Keys.NUMPAD_5),
+        DOWN(Input.Keys.SHIFT_LEFT, Input.Keys.NUMPAD_2),
         RIGHT(Input.Keys.L, Input.Keys.NUMPAD_6),
-        INSTANT_DROP(Input.Keys.SPACE, Input.Keys.DOWN),
-        HOLD_BLOCK(Input.Keys.I, Input.Keys.NUMPAD_8),
-        ROTATE_LEFT(Input.Keys.F, Input.Keys.LEFT),
-        ROTATE_RIGHT(Input.Keys.G, Input.Keys.RIGHT),
-        USE_ITEM(Input.Keys.H, Input.Keys.CONTROL_RIGHT),
+        INSTANT_DROP(Input.Keys.S, Input.Keys.DOWN),
+        HOLD_BLOCK(Input.Keys.W, Input.Keys.UP),
+        ROTATE_LEFT(Input.Keys.I, Input.Keys.NUMPAD_8),
+        ROTATE_RIGHT(Input.Keys.K, Input.Keys.NUMPAD_5),
+        USE_ITEM(Input.Keys.SPACE, Input.Keys.CONTROL_RIGHT),
         ANY_KEY(0,0);
 
         private final int player1, player2;
