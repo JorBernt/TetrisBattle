@@ -4,17 +4,17 @@ import com.badlogic.gdx.graphics.Color;
 
 public enum BlockTypes {
 
-    L(Color.RED),
-    T(Color.BLUE),
-    I(Color.LIME),
-    REVERSE_L(Color.PINK),
-    SQUIGGLY(Color.PURPLE),
-    REVERSE_SQUIGGLY(Color.YELLOW),
-    SQUARE(Color.GREEN),
-    NONE(Color.GRAY),
-    PLACED_BLOCK(Color.WHITE),
-    SOLID_BLOCK(Color.DARK_GRAY),
-    MONSTER(Color.GOLD);
+    L(Color.RED, true),
+    T(Color.BLUE, true),
+    I(Color.LIME, true),
+    REVERSE_L(Color.PINK, true),
+    SQUIGGLY(Color.PURPLE, true),
+    REVERSE_SQUIGGLY(Color.YELLOW, true),
+    SQUARE(Color.GREEN, true),
+    NONE(Color.GRAY, false),
+    PLACED_BLOCK(Color.WHITE, false),
+    SOLID_BLOCK(Color.DARK_GRAY, false),
+    MONSTER(Color.GOLD, false);
 
 
     public enum Direction {
@@ -22,9 +22,11 @@ public enum BlockTypes {
     }
 
     private final Color color;
+    private final boolean standardBlock;
 
-    BlockTypes(Color color) {
+    BlockTypes(Color color, boolean standardBlock) {
         this.color = color;
+        this.standardBlock = standardBlock;
     }
 
 
@@ -32,8 +34,10 @@ public enum BlockTypes {
         return color;
     }
 
+    public boolean isStandardBlock() { return standardBlock; }
+
     public int[][] getPosition(BlockTypes type, Direction direction) {
-        int[][] pos = new int[4][4];
+        int[][] pos;
         switch (type) {
             case I:
                 pos = new int[][]

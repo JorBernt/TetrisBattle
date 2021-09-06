@@ -86,7 +86,7 @@ public class Player {
         gameTimeCounter = 0;
         fallDownSpeedUp = 0.1f;
         holdBlock = new Block(BlockTypes.NONE, this);
-        powerUp = PowerUp.Item.MONSTER_BLOCK;
+        powerUp = PowerUp.Item.NONE;
         popUp = "";
         showPopUp = false;
         itemActive = false;

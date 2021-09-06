@@ -18,9 +18,11 @@ public abstract class PowerUp {
         MONSTER_BLOCK("Monster\nBlock");
 
         private final String name;
+
         Item(String name) {
             this.name = name;
         }
+
         public String getName() {
             return name;
         }

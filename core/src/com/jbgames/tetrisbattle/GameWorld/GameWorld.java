@@ -25,8 +25,8 @@ public class GameWorld {
         random = new Random();
         types = new ArrayList<>();
         for(BlockTypes type : BlockTypes.values()) {
-            if(type != BlockTypes.NONE && type != BlockTypes.PLACED_BLOCK && type != BlockTypes.SOLID_BLOCK && type != BlockTypes.MONSTER)
-            types.add(type);
+            if(type.isStandardBlock())
+                types.add(type);
         }
         player1 = new Player(1, this);
         player2 = new Player(2, this);

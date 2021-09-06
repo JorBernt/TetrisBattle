@@ -38,8 +38,7 @@ public class Block {
     }
 
     public void rotate(BlockTypes.Direction direction) {
-        int[][] temp;
-        temp = copyArray(blockLayout);
+        int[][] temp = copyArray(blockLayout);
         switch (direction) {
             case LEFT: {
                 blockLayout = rotateClockWise(blockLayout);
@@ -58,7 +57,6 @@ public class Block {
                         break;
                 }
                 break;
-
             }
             case RIGHT: {
                 blockLayout = rotateCounterClockWise(blockLayout);
@@ -109,24 +107,24 @@ public class Block {
         return copy;
     }
 
-    private int[][] rotateClockWise(int[][] matrix) {
-        int size = matrix.length;
+    private int[][] rotateClockWise(int[][] array) {
+        int size = array.length;
         int[][] ret = new int[size][size];
 
-        for (int i = 0; i < size; ++i)
-            for (int j = 0; j < size; ++j)
-                ret[i][j] = matrix[size - j - 1][i];
+        for (int i = 0; i < size; i++)
+            for (int j = 0; j < size; j++)
+                ret[i][j] = array[size - j - 1][i];
 
         return ret;
     }
 
-    private int[][] rotateCounterClockWise(int[][] matrix) {
-        int size = matrix.length;
+    private int[][] rotateCounterClockWise(int[][] array) {
+        int size = array.length;
         int[][] ret = new int[size][size];
 
-        for (int i = 0; i < size; ++i)
-            for (int j = 0; j < size; ++j)
-                ret[i][j] = matrix[j][size - i - 1];
+        for (int i = 0; i < size; i++)
+            for (int j = 0; j < size; j++)
+                ret[i][j] = array[j][size - i - 1];
 
         return ret;
     }
@@ -168,10 +166,7 @@ public class Block {
         position.y = startPosY;
         position.x = startPosX;
         toBePlaced = false;
-
     }
-
-
 
     public Player getPlayer() {
         return player;
