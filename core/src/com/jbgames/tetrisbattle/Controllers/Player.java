@@ -400,7 +400,9 @@ public class Player {
         if(numberOfBlocks > 4 || numberOfBlocks < 1) {
             throw new IllegalArgumentException("Must be 1-4 blocks!");
         }
-        blockQueue.clear();
+        for(int i = 0; i < numberOfBlocks; i++) {
+            blockQueue.poll();
+        }
         for(int i = 0; i < numberOfBlocks; i++) {
             blockQueue.add(new Block(type, this, new Point(30, 400)));
         }
