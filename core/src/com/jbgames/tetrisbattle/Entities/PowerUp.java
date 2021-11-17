@@ -60,14 +60,14 @@ public abstract class PowerUp {
                 target.setItemAffectGameScreen(true);
                 break;
             case FOUR_LINES:
-                attacker.setNewBlockQueue(BlockTypes.I);
+                attacker.setNewBlockQueue(BlockTypes.I, 4);
                 attacker.setPopUp("You used " + item.getName() + "!", true);
                 break;
             case SOLID_LINE:
                 target.addSolidLine();
                 break;
             case MONSTER_BLOCK:
-                target.setNextBlock(BlockTypes.MONSTER);
+                target.setNewBlockQueue(BlockTypes.MONSTER, 1);
                 break;
 
         }

@@ -17,16 +17,16 @@ public enum BlockTypes {
     MONSTER(Color.GOLD, false);
 
 
-    public enum Direction {
-        LEFT,RIGHT,UP,DOWN
-    }
-
     private final Color color;
     private final boolean standardBlock;
 
     BlockTypes(Color color, boolean standardBlock) {
         this.color = color;
         this.standardBlock = standardBlock;
+    }
+
+    public enum Direction {
+        LEFT,RIGHT,UP,DOWN
     }
 
 

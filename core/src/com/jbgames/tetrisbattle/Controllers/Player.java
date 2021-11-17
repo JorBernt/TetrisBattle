@@ -91,6 +91,7 @@ public class Player {
         showPopUp = false;
         itemActive = false;
         itemAffectGameScreen = false;
+        resetFallDownTimer();
     }
 
     public void update(float delta) {
@@ -349,18 +350,16 @@ public class Player {
 
     public void addSolidLine() {
         for(int i = 19; i > 0; i--) {
-            for(int j = 0; j < 10; j++) {
-                playerGrid[i+1][j] = playerGrid[i][j];
+            System.arraycopy(playerGrid[i], 0, playerGrid[i + 1], 0, 10);
+        }
+        for(int i = 0; i < 20; i++) {
+            if(playerGrid[i][0] != BlockTypes.SOLID_BLOCK) {
+                for(int j = 0; j < 10; j++) {
+                    playerGrid[i][j] = BlockTypes.SOLID_BLOCK;
+                }
+                break;
             }
         }
-        for(int i = 0; i < 10; i++) {
-            playerGrid[0][i] = BlockTypes.SOLID_BLOCK;
-        }
-    }
-
-    public void setNextBlock(BlockTypes type) {
-        blockQueue.poll();
-        blockQueue.addFirst(new Block(type, this, new Point(30, 400)));
     }
 
 
@@ -389,10 +388,21 @@ public class Player {
             score += value;
     }
 
-    public void setNewBlockQueue(BlockTypes type) {
+    /**
+     *
+     * @param type
+     * Type of block
+     * @param numberOfBlocks
+     * Max 4 blocks
+     *
+     */
+    public void setNewBlockQueue(BlockTypes type, int numberOfBlocks) {
+        if(numberOfBlocks > 4 || numberOfBlocks < 1) {
+            throw new IllegalArgumentException("Must be 1-4 blocks!");
+        }
         blockQueue.clear();
-        for(int i = 0; i < 4; i++) {
-            blockQueue.add(new Block(BlockTypes.I, this, new Point(30, 400)));
+        for(int i = 0; i < numberOfBlocks; i++) {
+            blockQueue.add(new Block(type, this, new Point(30, 400)));
         }
     }
 
